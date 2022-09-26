@@ -74,6 +74,8 @@ app.patch('/api/v1/unicorn/:id', (req, res) => {
 })
 
 app.delete('/api/v1/unicorn/:id', (req, res) => {
+    unicornsJSON = unicornsJSON.filter((element) => element._id != req.params.id)
+
     writeFileAsync('./data.json', JSON.stringify(unicornsJSON), 'utf-8')
         .then(() => { })
         .catch((err) => { console.log(err); })
