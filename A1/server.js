@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const axios = require('axios')
+const e = require('express')
 
 const app = express()
 const port = 5000
@@ -27,7 +28,11 @@ app.listen(port, async () => {
         const pokemonSchema = new Schema({
             "id": Number,
             "name": {
-                "english": String,
+                "english": {
+                    type: String,
+                    required: true,
+                    maxLength: 20
+                },
                 "japanese": String,
                 "chinese": String,
                 "french": String
@@ -87,7 +92,7 @@ app.listen(port, async () => {
             })
             .catch(err => {
                 console.log(err);
-                res.send({ errMsg: "Error: database reading error. Check with server devs." })
+                res.send({ errMsg: "Cast Error: pokemon id must be between 1 and 809." })
             })
     })
 
@@ -105,9 +110,12 @@ app.listen(port, async () => {
                     res.send({ errMsg: "Pokemon with that ID already exists." })
                 } else {
                     pokemonModel.create(req.body, function (err) {
-                        if (err) console.log(err);
+                        if (err) {
+                            res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
+                        } else {
+                            res.send({ msg: "Pokemon created successfully." })
+                        }
                     })
-                    res.send({ msg: "Pokemon created successfully." })
                 }
             }).catch(err => {
                 console.log(err);
@@ -118,29 +126,44 @@ app.listen(port, async () => {
     // - upsert a whole pokemon document
     app.put('/api/v1/pokemon/:id', (req, res) => {
         const { _id, ...rest } = req.body;
-        pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { upsert: true }, function (err, res) {
-            if (err) console.log(err)
-            console.log(res)
+        pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true, upsert: true }, function (err, doc) {
+            if (err) {
+                res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
+            } else {
+                res.json({ msg: "Pokemon upserted successfully.", data: doc })
+
+            }
         });
-        res.send({ msg: "Pokemon upserted successfully." })
     })
 
     // - patch a pokemon document or a portion of the pokemon document
     app.patch('/api/v1/pokemon/:id', (req, res) => {
         const { _id, ...rest } = req.body;
-        pokemonModel.updateOne({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true }, function (err, res) {
-            if (err) console.log(err)
-            console.log(res)
+        pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true }, function (err, doc) {
+            if (err) {
+                res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
+            } else {
+                res.json({ msg: "Pokemon updated successfully.", data: doc })
+            }
         });
-        res.send({ msg: "Pokemon updated successfully." })
     })
 
     // - delete a pokemon 
     app.delete('/api/v1/pokemon/:id', (req, res) => {
-        pokemonModel.deleteOne({ id: req.params.id }, function (err, result) {
-            if (err) console.log(err);
-        });
-        res.send({ msg: "Deleted pokemon successfully." })
+        pokemonModel.find({ id: req.params.id })
+            .then(pokeDoc => {
+                if (pokeDoc.length > 0) {
+                    pokemonModel.deleteOne({ id: req.params.id }, function (err, result) {
+                        if (err) console.log(err);
+                    });
+                    res.send({ msg: "Deleted pokemon successfully." })
+                } else {
+                    res.send({ errMsg: "Error: pokemon not found." })
+                }
+            })
     })
 })
 
+app.get('*', (req, res) => {
+    res.send({ errMsg: "Improper route. Check API docs plz." })
+})
