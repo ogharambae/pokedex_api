@@ -74,12 +74,21 @@ app.listen(port, async () => {
     })
 
     // - create a new pokemon
-    app.post('/api/v1/pokemon', (req, res) => {
-        pokemonModel.create(req.body, function (err) {
-            if (err) console.log(err);
-        })
-        res.send({ msg: "Pokemond created successfully." });
-        res.json(req.body);
+    app.post('/api/v1/pokemon', express.json(), (req, res) => {
+        pokemonModel.find({ id: req.body.id })
+            .then(pokeDoc => {
+                if (pokeDoc.length > 0) {
+                    res.send({ errMsg: "Pokemon with that ID already exists." })
+                } else {
+                    pokemonModel.create(req.body, function (err) {
+                        if (err) console.log(err);
+                    })
+                    res.send({ msg: "Pokemon created successfully." })
+                }
+            }).catch(err => {
+                console.log(err);
+                res.send({ errMsg: "Error: database reading error. Check with server devs." })
+            })
     })
 
     // - get a pokemon
@@ -111,7 +120,8 @@ app.listen(port, async () => {
 
     // - patch a pokemon document or a portion of the pokemon document
     app.patch('/api/v1/pokemon/:id', (req, res) => {
-
+        const { _id, ...rest } = req.body;
+        pokemonModel.updateOne({})
     })
 
     // - delete a  pokemon 
