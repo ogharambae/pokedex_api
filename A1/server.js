@@ -8,7 +8,7 @@ const port = 5000
 
 let pokemonModel = null;
 
-app.listen(port, async () => {
+app.listen(process.env.PORT || port, async () => {
     try {
         await mongoose.connect('mongodb://localhost:27017/test')
         await mongoose.connection.db.dropDatabase();
