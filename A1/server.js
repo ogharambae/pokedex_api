@@ -53,12 +53,65 @@ app.listen(port, async () => {
         console.log('Error populating db')
     }
 
-    // app.get('/api/v1/pokemons?count=2&after=10')     // - get all the pokemons after the 10th. List only Two.
-    // app.post('/api/v1/pokemon')                      // - create a new pokemon
-    // app.get('/api/v1/pokemon/:id')                   // - get a pokemon
-    // app.get('/api/v1/pokemonImage/:id')              // - get a pokemon Image URL
-    // app.put('/api/v1/pokemon/:id')                   // - upsert a whole pokemon document
-    // app.patch('/api/v1/pokemon/:id')                 // - patch a pokemon document or a portion of the pokemon document
-    // app.delete('/api/v1/pokemon/:id')                // - delete a  pokemon 
+    // - get all the pokemons after the 10th. List only Two.
+    app.get('/api/v1/pokemons', (req, res) => {
+        let query = pokemonModel.find({}).sort('id');
+
+        if (req.query.after) {
+            query = query.skip(req.query.after);
+        }
+
+        if (req.query.count) {
+            query = query.limit(req.query.count);
+        }
+        query.exec().then((pokeDoc) => {
+            if (pokeDoc.length > 0) {
+                res.json(pokeDoc);
+            } else {
+                res.send({ errMsg: "Error: no pokemon(s) found. Please check your params again." });
+            }
+        })
+    })
+
+    // - create a new pokemon
+    app.post('/api/v1/pokemon', (req, res) => {
+
+    })
+
+    // - get a pokemon
+    app.get('/api/v1/pokemon/:id', (req, res) => {
+        pokemonModel.find({ id: req.params.id })
+            .then(pokeDoc => {
+                if (pokeDoc.length > 0) {
+                    res.json(pokeDoc)
+                } else {
+                    res.send({ errMsg: "Error: no pokemon found with specified id. Please check your id again." })
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                res.send({ errMsg: "Error: database reading error. Check with server devs." })
+            })
+    })
+
+    // - get a pokemon Image URL
+    app.get('/api/v1/pokemonImage/:id', (req, res) => {
+
+    })
+
+    // - upsert a whole pokemon document
+    app.put('/api/v1/pokemon/:id', (req, res) => {
+
+    })
+
+    // - patch a pokemon document or a portion of the pokemon document
+    app.patch('/api/v1/pokemon/:id', (req, res) => {
+
+    })
+
+    // - delete a  pokemon 
+    app.delete('/api/v1/pokemon/:id', (req, res) => {
+
+    })
 })
 
