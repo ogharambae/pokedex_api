@@ -162,8 +162,8 @@ app.listen(process.env.PORT || port, async () => {
                 }
             })
     })
-})
 
-app.get('*', (req, res) => {
-    res.send({ errMsg: "Improper route. Check API docs plz." })
+    app.get('*', (req, res) => {
+        res.send({ errMsg: "Improper route. Check API docs plz." })
+    })
 })
