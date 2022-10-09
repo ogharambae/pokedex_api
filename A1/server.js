@@ -117,7 +117,12 @@ app.listen(port, async () => {
 
     // - upsert a whole pokemon document
     app.put('/api/v1/pokemon/:id', (req, res) => {
-
+        const { _id, ...rest } = req.body;
+        pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { upsert: true }, function (err, res) {
+            if (err) console.log(err)
+            console.log(res)
+        });
+        res.send({ msg: "Pokemon upserted successfully." })
     })
 
     // - patch a pokemon document or a portion of the pokemon document
