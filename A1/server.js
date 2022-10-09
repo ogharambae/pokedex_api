@@ -130,9 +130,12 @@ app.listen(port, async () => {
         res.send({ msg: "Pokemon updated successfully." })
     })
 
-    // - delete a  pokemon 
+    // - delete a pokemon 
     app.delete('/api/v1/pokemon/:id', (req, res) => {
-
+        pokemonModel.deleteOne({ id: req.params.id }, function (err, result) {
+            if (err) console.log(err);
+        });
+        res.send({ msg: "Deleted pokemon successfully." })
     })
 })
 
