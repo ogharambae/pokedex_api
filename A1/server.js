@@ -100,7 +100,8 @@ app.listen(port, async () => {
 
     // - get a pokemon Image URL
     app.get('/api/v1/pokemonImage/:id', (req, res) => {
-
+        let id = req.params.id;
+        res.json({ url: "https://github.com/fanzeyi/pokemon.json/blob/master/images/" + id + ".png" })
     })
 
     // - upsert a whole pokemon document
