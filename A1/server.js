@@ -53,6 +53,8 @@ app.listen(port, async () => {
         console.log('Error populating db')
     }
 
+    app.use(express.json())
+
     // - get all the pokemons after the 10th. List only Two.
     app.get('/api/v1/pokemons', (req, res) => {
         let query = pokemonModel.find({}).sort('id');
@@ -71,24 +73,6 @@ app.listen(port, async () => {
                 res.send({ errMsg: "Error: no pokemon(s) found. Please check your params again." });
             }
         })
-    })
-
-    // - create a new pokemon
-    app.post('/api/v1/pokemon', express.json(), (req, res) => {
-        pokemonModel.find({ id: req.body.id })
-            .then(pokeDoc => {
-                if (pokeDoc.length > 0) {
-                    res.send({ errMsg: "Pokemon with that ID already exists." })
-                } else {
-                    pokemonModel.create(req.body, function (err) {
-                        if (err) console.log(err);
-                    })
-                    res.send({ msg: "Pokemon created successfully." })
-                }
-            }).catch(err => {
-                console.log(err);
-                res.send({ errMsg: "Error: database reading error. Check with server devs." })
-            })
     })
 
     // - get a pokemon
@@ -113,6 +97,24 @@ app.listen(port, async () => {
         res.json({ url: "https://github.com/fanzeyi/pokemon.json/blob/master/images/" + id + ".png" })
     })
 
+    // - create a new pokemon
+    app.post('/api/v1/pokemon', (req, res) => {
+        pokemonModel.find({ id: req.body.id })
+            .then(pokeDoc => {
+                if (pokeDoc.length > 0) {
+                    res.send({ errMsg: "Pokemon with that ID already exists." })
+                } else {
+                    pokemonModel.create(req.body, function (err) {
+                        if (err) console.log(err);
+                    })
+                    res.send({ msg: "Pokemon created successfully." })
+                }
+            }).catch(err => {
+                console.log(err);
+                res.send({ errMsg: "Error: database reading error. Check with server devs." })
+            })
+    })
+
     // - upsert a whole pokemon document
     app.put('/api/v1/pokemon/:id', (req, res) => {
 
@@ -121,7 +123,11 @@ app.listen(port, async () => {
     // - patch a pokemon document or a portion of the pokemon document
     app.patch('/api/v1/pokemon/:id', (req, res) => {
         const { _id, ...rest } = req.body;
-        pokemonModel.updateOne({})
+        pokemonModel.updateOne({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true }, function (err, res) {
+            if (err) console.log(err)
+            console.log(res)
+        });
+        res.send({ msg: "Pokemon updated successfully." })
     })
 
     // - delete a  pokemon 
