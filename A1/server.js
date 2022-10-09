@@ -75,7 +75,11 @@ app.listen(port, async () => {
 
     // - create a new pokemon
     app.post('/api/v1/pokemon', (req, res) => {
-
+        pokemonModel.create(req.body, function (err) {
+            if (err) console.log(err);
+        })
+        res.send({ msg: "Pokemond created successfully." });
+        res.json(req.body);
     })
 
     // - get a pokemon
