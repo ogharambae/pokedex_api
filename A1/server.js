@@ -11,7 +11,7 @@ let pokemonModel = null;
 app.listen(process.env.PORT || port, async () => {
     try {
         await mongoose.connect('mongodb+srv://hyunbae:BK2FeIG9GpvBFiTj@cluster0.cnjwrfq.mongodb.net/a1?retryWrites=true&w=majority')
-        // await mongoose.connection.db.dropDatabase();
+        await mongoose.connection.db.dropCollection("pokemons");
 
         const pokeRes = await axios.get("https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/pokedex.json")
         if (!pokeRes || !pokeRes.data || pokeRes.status != 200) {
