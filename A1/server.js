@@ -53,7 +53,6 @@ app.listen(process.env.PORT || port, async () => {
         })
         pokemonModel = mongoose.model('pokemons', pokemonSchema);
         await pokemonModel.create(pokeRes.data)
-
     } catch (error) {
         console.log('Error populating db')
     }
@@ -162,6 +161,35 @@ app.delete('/api/v1/pokemon/:id', (req, res) => {
                 res.send({ errMsg: "Error: pokemon not found." })
             }
         })
+})
+
+app.get('/pokemonsAdvancedFiltering', async (req, res) => {
+    const { id, base, type, name, sort, filteredProperty } = req.query;
+    let query = {};
+
+    if (id) {
+        query.id = req.query.id
+    }
+    if (base) {
+        if (req.query.base.HP) {
+            query.base.HP = req.query.base.HP
+        }
+    }
+    if (type) {
+        query.type = { $in: type.split(",").map(item => item.trim()) }
+    }
+
+    const mongooseQuery = pokemonModel.find(query);
+
+    if (sort) {
+        mongooseQuery.sort(sort)
+    }
+    if (filteredProperty) {
+        mongooseQuery.select(filteredProperty.replace(/,/g, " ") + "-_id")
+    }
+
+    const queriedPoke = await mongooseQuery;
+    res.send(queriedPoke);
 })
 
 app.get('*', (req, res) => {
