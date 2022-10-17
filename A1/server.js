@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const axios = require('axios')
 const e = require('express')
+const { response } = require('express')
 
 const app = express()
 const port = 5000
@@ -17,6 +18,12 @@ app.listen(process.env.PORT || port, async () => {
         if (!pokeRes || !pokeRes.data || pokeRes.status != 200) {
             throw new Error("Error: could not load pokemon data.")
         }
+
+        const pokemonData = pokeRes.data.map((d) => {
+            d.base["Speed Attack"] = d.base["Sp. Attack"];
+            d.base["Speed Defense"] = d.base["Sp. Defense"];
+            return d;
+        })
 
         const typeRes = await axios.get("https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/types.json")
         if (!typeRes || !typeRes.data || typeRes.status != 200) {
@@ -46,13 +53,14 @@ app.listen(process.env.PORT || port, async () => {
                 "HP": Number,
                 "Attack": Number,
                 "Defense": Number,
-                "Sp. Attack": Number,
-                "Sp. Defense": Number,
+                "Speed Attack": Number,
+                "Speed Defense": Number,
                 "Speed": Number
             }
         })
         pokemonModel = mongoose.model('pokemons', pokemonSchema);
-        await pokemonModel.create(pokeRes.data)
+
+        await pokemonModel.create(pokemonData)
     } catch (error) {
         console.log('Error populating db')
     }
@@ -162,6 +170,20 @@ app.delete('/api/v1/pokemon/:id', (req, res) => {
             }
         })
 })
+
+async function argsParse(sortSelect, sortParams) {
+
+    const sortArray = sortParams.split(",");
+    sortArray.forEach(element => {
+        element = element.trim();
+
+        if (element.charAt(0) === '-') {
+            sortSelect[element.substring(1)] == -1
+        } else {
+            sortSelect[element] = 1
+        }
+    })
+}
 
 app.get('/pokemonsAdvancedFiltering', async (req, res) => {
     const { id, base, type, name, sort, filteredProperty } = req.query;
