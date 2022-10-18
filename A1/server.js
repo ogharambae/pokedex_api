@@ -171,47 +171,80 @@ app.delete('/api/v1/pokemon/:id', (req, res) => {
         })
 })
 
-async function argsParse(sortSelect, sortParams) {
-
-    const sortArray = sortParams.split(",");
-    sortArray.forEach(element => {
-        element = element.trim();
-
-        if (element.charAt(0) === '-') {
-            sortSelect[element.substring(1)] == -1
-        } else {
-            sortSelect[element] = 1
-        }
-    })
-}
-
 app.get('/pokemonsAdvancedFiltering', async (req, res) => {
-    const { id, base, type, name, sort, filteredProperty } = req.query;
     let query = {};
+    let sortBy = {};
+    let filterArr = {};
+
+    const {
+        'name.english': nameEnglish,
+        'name.chinese': nameChinese,
+        'name.japanese': nameJapanese,
+        'name.french': nameFrench,
+        'base.HP': baseHP,
+        'base.Attack': baseAttack,
+        'base.Speed Attack': baseSpeedAttack,
+        'base.Speed Defense': baseSpeedDefense,
+        'base.Speed': baseSpeed,
+        id, type, sort, filteredProperty } = req.body;
+    var { page, hitsPerPage } = req.query;
+
+    if (nameEnglish) query['name.english'] = nameEnglish
+    if (nameChinese) query['name.chinese'] = nameChinese
+    if (nameJapanese) query['name.japanese'] = nameJapanese
+    if (nameFrench) query['name.french'] = nameFrench
+    if (baseHP) query['base.HP'] = baseHP
+    if (baseAttack) query['base.Attack'] = baseAttack
+    if (baseSpeedAttack) query["base.Speed Attack"] = Number(baseSpeedAttack)
+    if (baseSpeedDefense) query["base.Speed Defense"] = baseSpeedDefense
+    if (baseSpeed) query['base.Speed'] = baseSpeed
 
     if (id) {
-        query.id = req.query.id
-    }
-    if (base) {
-        if (req.query.base.HP) {
-            query.base.HP = req.query.base.HP
-        }
-    }
-    if (type) {
-        query.type = { $in: type.split(",").map(item => item.trim()) }
+        query.id = id;
     }
 
-    const mongooseQuery = pokemonModel.find(query);
+    if (type) {
+        const types = type.split(',').map(item => item.trim());
+        query.type = { $in: types }
+    }
 
     if (sort) {
-        mongooseQuery.sort(sort)
-    }
-    if (filteredProperty) {
-        mongooseQuery.select(filteredProperty.replace(/,/g, " ") + "-_id")
+        sort.split(",").map((e) => e.trim()).forEach((e) => {
+            if (e[0] === "-") {
+                sortBy[e.substring(1)] == -1;
+            } else {
+                sortBy[e] = 1;
+            }
+        })
     }
 
-    const queriedPoke = await mongooseQuery;
-    res.send(queriedPoke);
+    if (filteredProperty) {
+        filterArr = filteredProperty.split(",").map((i) => i.trim());
+    }
+
+    if (page) {
+        page = parseInt(page);
+    } else {
+        page = 1;
+    }
+
+    if (hitsPerPage) {
+        hitsPerPage = parseInt(hitsPerPage);
+    } else {
+        hitsPerPage = 5;
+    }
+
+    const pokemons = await pokemonModel.find(query).sort(sortBy).select(filterArr).limit(page * hitsPerPage);
+
+    res.send({
+        hits: pokemons,
+        page: page,
+        numHits: pokemons.length,
+        numPages: Math.ceil(pokemons.length / hitsPerPage),
+        hitsPerPage: hitsPerPage,
+        query: query,
+        params: req.url.substring(req.url.indexOf('?') + 1)
+    });
 })
 
 app.get('*', (req, res) => {
