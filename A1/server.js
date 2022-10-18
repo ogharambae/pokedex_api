@@ -171,55 +171,102 @@ app.delete('/api/v1/pokemon/:id', (req, res) => {
         })
 })
 
-app.get('/pokemonsAdvancedFiltering', async (req, res) => {
-    let query = {};
-    let sortBy = {};
-    let filterArr = {};
+function paramHandler(req, res, next) {
+    let check = req.query;
 
-    const {
-        'name.english': nameEnglish,
-        'name.chinese': nameChinese,
-        'name.japanese': nameJapanese,
-        'name.french': nameFrench,
-        'base.HP': baseHP,
-        'base.Attack': baseAttack,
-        'base.Speed Attack': baseSpeedAttack,
-        'base.Speed Defense': baseSpeedDefense,
-        'base.Speed': baseSpeed,
-        id, type, sort, filteredProperty } = req.body;
-    var { page, hitsPerPage } = req.query;
-
-    if (nameEnglish) query['name.english'] = nameEnglish
-    if (nameChinese) query['name.chinese'] = nameChinese
-    if (nameJapanese) query['name.japanese'] = nameJapanese
-    if (nameFrench) query['name.french'] = nameFrench
-    if (baseHP) query['base.HP'] = baseHP
-    if (baseAttack) query['base.Attack'] = baseAttack
-    if (baseSpeedAttack) query["base.Speed Attack"] = Number(baseSpeedAttack)
-    if (baseSpeedDefense) query["base.Speed Defense"] = baseSpeedDefense
-    if (baseSpeed) query['base.Speed'] = baseSpeed
-
-    if (id) {
-        query.id = id;
-    }
-
-    if (type) {
-        const types = type.split(',').map(item => item.trim());
-        query.type = { $in: types }
-    }
-
-    if (sort) {
-        sort.split(",").map((e) => e.trim()).forEach((e) => {
-            if (e[0] === "-") {
-                sortBy[e.substring(1)] == -1;
-            } else {
-                sortBy[e] = 1;
+    const validParams = [
+        "base",
+        "name",
+        "id",
+        "type",
+        "filteredProperty",
+        "name.english",
+        "name.chinese",
+        "name.japanese",
+        "name.french",
+        "base.HP",
+        "base.Attack",
+        "base.Speed Attack",
+        "base.Speed Defense",
+        "base.Speed",
+        "page",
+        "hitsPerPage",
+        "sort"
+    ];
+    Object.keys(check)
+        .forEach((k) => {
+            if (!validParams.includes(k)) {
+                res.send({ errMsg: "Error: Invalid parameter. Please double check your parameter names." });
+                return;
             }
         })
+    next();
+}
+
+function pageHandler(req, res, next) {
+    let check = req.query.page;
+    let checkTwo = req.query.hitsPerPage;
+    if (check && isNaN(check)) {
+        res.send({ errMsg: "Error: page must be a number." })
+        return;
+    } else if (checkTwo && isNaN(checkTwo)) {
+        res.send({ errMsg: "Error: hitsPerPage must be a number." })
+        return;
+    }
+    next();
+}
+
+function typeHandler(req, res, next) {
+    let check = req.query.type;
+    if (check && isNaN(check)) {
+        next();
+    } else {
+        res.send({ errMsg: "Error: type must be a string." });
+        return;
+    }
+}
+
+// function baseHandler(req, res, next) {
+//     let check = req.query.base.HP;
+//     console.log(check);
+//     // check.forEach((e) => {
+//     //     console.log(e);
+//     //     if (e && isNaN(e)) {
+//     //         res.send({ errMsg: "Error: base values be a number." })
+//     //     }
+//     // })
+//     next();
+// }
+
+var errHandler = [paramHandler, pageHandler, typeHandler];
+
+app.get('/pokemonsAdvancedFiltering', errHandler, async (req, res) => {
+    let query = req.query;
+    let { type, sort, page, hitsPerPage } = req.query
+
+    if (type) {
+        const types = query.type.split(',').map(item => item.trim());
+        type = { $in: types };
     }
 
-    if (filteredProperty) {
-        filterArr = filteredProperty.split(",").map((i) => i.trim());
+    let sortBy = {};
+
+    if (sort) {
+        query.sort.split(",")
+            .map((s) => s.trim())
+            .forEach((e) => {
+                if (e[0] === '-') {
+                    sortBy[e.substring(1)] == -1
+                } else {
+                    sortBy[e] = 1
+                }
+            });
+    }
+
+    let filterArr = {};
+
+    if (query.filteredProperty) {
+        filterArr = query.filteredProperty.split(',').map(item => item.trim());
     }
 
     if (page) {
@@ -234,16 +281,15 @@ app.get('/pokemonsAdvancedFiltering', async (req, res) => {
         hitsPerPage = 5;
     }
 
-    const pokemons = await pokemonModel.find(query).sort(sortBy).select(filterArr).limit(page * hitsPerPage);
+    const pokemon = await pokemonModel.find(query).sort(sortBy).select(filterArr).limit(page * hitsPerPage);
 
     res.send({
-        hits: pokemons,
-        page: page,
-        numHits: pokemons.length,
-        numPages: Math.ceil(pokemons.length / hitsPerPage),
-        hitsPerPage: hitsPerPage,
-        query: query,
-        params: req.url.substring(req.url.indexOf('?') + 1)
+        hits: pokemon,
+        page: query.page,
+        numHits: pokemon.length,
+        numPages: Math.ceil(pokemon.length / hitsPerPage),
+        hitsPerPage: query.hitsPerPage,
+        params: req.query
     });
 })
 
