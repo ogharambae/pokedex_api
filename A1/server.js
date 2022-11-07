@@ -1,8 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const axios = require('axios')
-const e = require('express')
-const { response } = require('express')
+
 
 const app = express()
 const port = 5000
@@ -293,67 +292,66 @@ app.delete('/api/v1/pokemon/:id', (req, res) => {
 //     });
 // })
 
-app.get("/pokemonsAdvancedFiltering", async (req, res) => {
+// app.get("/pokemonsAdvancedFiltering", async (req, res) => {
 
-    let query = {};
-    let operatorsBefore = {};
-    let stat = [];
-    let extractedOps = [];
-    let converted = [];
-    let value = [];
+//     let query = {};
+//     let operatorsBefore = {};
+//     let stat = [];
+//     let extractedOps = [];
+//     let converted = [];
+//     let value = [];
 
-    Object.keys(req.query).forEach((q) => {
-        if (q.includes("comparisonOperators")) {
-            operatorsBefore = req.query[q].split(",").map((operatorsBefore) => operatorsBefore.trim());
-            query[q] = { $in: operatorsBefore }
-        }
-    })
-    operatorsBefore.forEach((e) => {
-        extracted = e.split(/(<=|>=|==|!=|>|<)/g);
-        stat.push(extracted[0]);
-        extractedOps.push(extracted[1]);
-        value.push(extracted[2]);
-    })
-    extractedOps.forEach((e) => {
-        if (e == "<=") {
-            converted.push("$lte")
-        } else if (e == ">=") {
-            converted.push("$gte")
-        } else if (e == "==") {
-            converted.push("$eq")
-        } else if (e == "!=") {
-            converted.push("$ne")
-        } else if (e == ">") {
-            converted.push("$gt")
-        } else if (e == "<") {
-            converted.push("$lt")
-        }
-    })
-    console.log(stat);
-    console.log(converted);
-    console.log(value);
-    let result = await pokemonModel.find(
-        {
-            base: {
-                stat: { converted: value }
-            },
-        }
-    )
-    res.send(result);
-})
+//     Object.keys(req.query).forEach((q) => {
+//         if (q.includes("comparisonOperators")) {
+//             operatorsBefore = req.query[q].split(",").map((operatorsBefore) => operatorsBefore.trim());
+//             query[q] = { $in: operatorsBefore }
+//         }
+//     })
+//     operatorsBefore.forEach((e) => {
+//         extracted = e.split(/(<=|>=|==|!=|>|<)/g);
+//         stat.push(extracted[0]);
+//         extractedOps.push(extracted[1]);
+//         value.push(extracted[2]);
+//     })
+//     extractedOps.forEach((e) => {
+//         if (e == "<=") {
+//             converted.push("$lte")
+//         } else if (e == ">=") {
+//             converted.push("$gte")
+//         } else if (e == "==") {
+//             converted.push("$eq")
+//         } else if (e == "!=") {
+//             converted.push("$ne")
+//         } else if (e == ">") {
+//             converted.push("$gt")
+//         } else if (e == "<") {
+//             converted.push("$lt")
+//         }
+//     })
+//     console.log(stat);
+//     console.log(converted);
+//     console.log(value);
+//     let result = await pokemonModel.find(
+//         {
+//             base: {
+//                 stat: { converted: value }
+//             },
+//         }
+//     )
+//     res.send(result);
+// })
 
-app.patch("/pokemonsAdvancedUpdate", async (req, res) => {
-    const { id, pushOperator } = req.query;
+// app.patch("/pokemonsAdvancedUpdate", async (req, res) => {
+//     const { id, pushOperator } = req.query;
 
-    var cleaned = pushOperator.replace(/\[/g, '');
-    cleaned = cleaned.replace(/\]/g, '');
-    let types = cleaned.split(',').map(item => item.trim());
-    console.log(types);
+//     var cleaned = pushOperator.replace(/\[/g, '');
+//     cleaned = cleaned.replace(/\]/g, '');
+//     let types = cleaned.split(',').map(item => item.trim());
+//     console.log(types);
 
-    await pokemonModel.findOneAndUpdate({ id: id }, { new: true, upsert: false, runValidators: true }, { $addToSet: { type: { $each: types } } });
-    res.send({ msg: "Updated pokemon." })
-})
-
+//     await pokemonModel.findOneAndUpdate({ id: id }, { new: true, upsert: false, runValidators: true }, { $addToSet: { type: { $each: types } } });
+//     res.send({ msg: "Updated pokemon." })
+// })
 
 app.get('*', (req, res) => {
     res.send({ errMsg: "Improper route. Check API docs plz." })
