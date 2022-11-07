@@ -16,6 +16,15 @@ class PokemonNotFound extends Error {
     }
 }
 
+class PokemonImageNotFound extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "PokemonImageNotFound";
+        this.message = "Error: pokemon image with provided request was not found.";
+        this.errorCode = 400;
+    }
+}
+
 class PokemonDb extends Error {
     constructor(message) {
         super(message);
@@ -55,6 +64,7 @@ class PokemonNoSuchRoute extends PokemonBadRequest {
 module.exports = {
     PokemonBadRequest,
     PokemonNotFound,
+    PokemonImageNotFound,
     PokemonDb,
     PokemonDuplicate,
     PokemonMissingID,
