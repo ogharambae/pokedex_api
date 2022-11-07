@@ -43,15 +43,6 @@ class PokemonMissingID extends PokemonBadRequest {
     }
 }
 
-class PokemonMissingAfter extends PokemonBadRequest {
-    constructor(message) {
-        super(message);
-        this.name = "PokemonMissingAfter";
-        this.message = "Error: please check the API doc as provided request is invalid.";
-        this.errorCode = 500;
-    }
-}
-
 class PokemonNoSuchRoute extends PokemonBadRequest {
     constructor(message) {
         super(message);
@@ -67,6 +58,5 @@ module.exports = {
     PokemonDb,
     PokemonDuplicate,
     PokemonMissingID,
-    PokemonMissingAfter,
     PokemonNoSuchRoute
 }
