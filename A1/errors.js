@@ -60,3 +60,13 @@ class PokemonNoSuchRoute extends PokemonBadRequest {
         this.errorCode = 500;
     }
 }
+
+module.exports = {
+    PokemonBadRequest,
+    PokemonNotFound,
+    PokemonDb,
+    PokemonDuplicate,
+    PokemonMissingID,
+    PokemonMissingAfter,
+    PokemonNoSuchRoute
+}
