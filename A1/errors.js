@@ -61,6 +61,15 @@ class PokemonNoSuchRoute extends PokemonBadRequest {
     }
 }
 
+class PokemonNotFoundWithID extends PokemonNotFound {
+    constructor(message) {
+        super(message);
+        this.name = "PokemonNotFoundWithID";
+        this.message = "Error: pokemon with provided ID was not found. Please check the ID again.";
+        this.errorCode = 500;
+    }
+}
+
 module.exports = {
     PokemonBadRequest,
     PokemonNotFound,
@@ -68,5 +77,6 @@ module.exports = {
     PokemonDb,
     PokemonDuplicate,
     PokemonMissingID,
-    PokemonNoSuchRoute
+    PokemonNoSuchRoute,
+    PokemonNotFoundWithID
 }
