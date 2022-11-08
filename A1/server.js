@@ -1,7 +1,17 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const axios = require('axios')
-
+const express = require("express")
+const mongoose = require("mongoose")
+const axios = require("axios")
+const { asyncWrapper } = require("./asyncWrapper")
+const {
+    PokemonBadRequest,
+    PokemonNotFound,
+    PokemonImageNotFound,
+    PokemonDb,
+    PokemonDuplicate,
+    PokemonMissingID,
+    PokemonNoSuchRoute,
+    PokemonNotFoundWithID
+} = require("./errors")
 
 const app = express()
 const port = 5000
@@ -61,20 +71,18 @@ app.listen(process.env.PORT || port, async () => {
 
         await pokemonModel.create(pokemonData)
     } catch (error) {
-        console.log('Error populating db')
+        throw new PokemonDb(error);
     }
 })
 
 app.use(express.json())
 
 // - get all the pokemons after the 10th. List only Two.
-app.get('/api/v1/pokemons', (req, res) => {
+app.get('/api/v1/pokemons', asyncWrapper(async (req, res) => {
     let query = pokemonModel.find({}).sort('id');
-
     if (req.query.after) {
         query = query.skip(req.query.after);
     }
-
     if (req.query.count) {
         query = query.limit(req.query.count);
     }
@@ -82,81 +90,96 @@ app.get('/api/v1/pokemons', (req, res) => {
         if (pokeDoc.length > 0) {
             res.json(pokeDoc);
         } else {
-            res.send({ errMsg: "Error: no pokemon(s) found. Please check your params again." });
+            // res.send({ errMsg: "Error: no pokemon(s) found. Please check your params again." });
+            throw new PokemonNotFound();
         }
-    })
-})
+    });
+}))
 
 // - get a pokemon
-app.get('/api/v1/pokemon/:id', (req, res) => {
-    pokemonModel.find({ id: req.params.id })
+app.get('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
+    if (!req.params.id) {
+        throw new PokemonMissingID();
+    }
+    await pokemonModel.find({ id: req.params.id })
         .then(pokeDoc => {
             if (pokeDoc.length > 0) {
                 res.json(pokeDoc)
             } else {
-                res.send({ errMsg: "Error: no pokemon found with specified id. Please check your id again." })
+                // res.send({ errMsg: "Error: no pokemon found with specified id. Please check your id again." });
+                throw new PokemonNotFoundWithID();
             }
         })
-        .catch(err => {
-            console.log(err);
-            res.send({ errMsg: "Cast Error: pokemon id must be between 1 and 809." })
+        .catch((err) => {
+            // res.send({ errMsg: "Cast Error: pokemon id must be between 1 and 809." });
+            throw new PokemonBadRequest(err);
         })
-})
+}))
 
 // - get a pokemon Image URL
-app.get('/api/v1/pokemonImage/:id', (req, res) => {
-    let id = req.params.id;
-    res.json({ url: "https://github.com/fanzeyi/pokemon.json/blob/master/images/" + id + ".png" })
-})
+app.get('/api/v1/pokemonImage/:id', asyncWrapper(async (req, res) => {
+    if (!req.params.id) {
+        throw new PokemonMissingID();
+    }
+    try {
+        let id = req.params.id;
+        res.json({ url: "https://github.com/fanzeyi/pokemon.json/blob/master/images/" + id + ".png" });
+    } catch (err) {
+        throw new PokemonImageNotFound(err);
+    }
+}))
 
 // - create a new pokemon
-app.post('/api/v1/pokemon', (req, res) => {
+app.post('/api/v1/pokemon', asyncWrapper(async (req, res) => {
     pokemonModel.find({ id: req.body.id })
         .then(pokeDoc => {
             if (pokeDoc.length > 0) {
-                res.send({ errMsg: "Pokemon with that ID already exists." })
+                // res.send({ errMsg: "Pokemon with that ID already exists." })
+                throw new PokemonDuplicate();
             } else {
                 pokemonModel.create(req.body, function (err) {
                     if (err) {
-                        res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
+                        throw new PokemonBadRequest(err);
+                        // res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
                     } else {
                         res.send({ msg: "Pokemon created successfully." })
                     }
                 })
             }
-        }).catch(err => {
-            console.log(err);
-            res.send({ errMsg: "Error: database reading error. Check with server devs." })
+        }).catch((err) => {
+            // res.send({ errMsg: "Error: database reading error. Check with server devs." })
+            throw new PokemonDb(err);
         })
-})
+}))
 
 // - upsert a whole pokemon document
-app.put('/api/v1/pokemon/:id', (req, res) => {
+app.put('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
     const { _id, ...rest } = req.body;
     pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true, upsert: true }, function (err, doc) {
         if (err) {
-            res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
+            throw new PokemonBadRequest(err);
+            // res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
         } else {
             res.json({ msg: "Pokemon upserted successfully.", data: doc })
-
         }
     });
-})
+}))
 
 // - patch a pokemon document or a portion of the pokemon document
-app.patch('/api/v1/pokemon/:id', (req, res) => {
+app.patch('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
     const { _id, ...rest } = req.body;
     pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true }, function (err, doc) {
         if (err) {
-            res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
+            throw new PokemonBadRequest();
+            // res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
         } else {
             res.json({ msg: "Pokemon updated successfully.", data: doc })
         }
     });
-})
+}))
 
 // - delete a pokemon 
-app.delete('/api/v1/pokemon/:id', (req, res) => {
+app.delete('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
     pokemonModel.find({ id: req.params.id })
         .then(pokeDoc => {
             if (pokeDoc.length > 0) {
@@ -165,10 +188,11 @@ app.delete('/api/v1/pokemon/:id', (req, res) => {
                 });
                 res.send({ msg: "Deleted pokemon successfully." })
             } else {
-                res.send({ errMsg: "Error: pokemon not found." })
+                throw new PokemonNotFound();
+                // res.send({ errMsg: "Error: pokemon not found." })
             }
         })
-})
+}))
 
 // function paramHandler(req, res, next) {
 //     let check = req.query;
@@ -353,6 +377,7 @@ app.delete('/api/v1/pokemon/:id', (req, res) => {
 //     res.send({ msg: "Updated pokemon." })
 // })
 
-app.get('*', (req, res) => {
-    res.send({ errMsg: "Improper route. Check API docs plz." })
-})
+app.get('*', asyncWrapper(async (req, res) => {
+    // res.send({ errMsg: "Improper route. Check API docs plz." })
+    throw new PokemonNoSuchRoute();
+}))
