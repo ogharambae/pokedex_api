@@ -131,7 +131,7 @@ app.get('/api/v1/pokemonImage/:id', asyncWrapper(async (req, res) => {
 
 // - create a new pokemon
 app.post('/api/v1/pokemon', asyncWrapper(async (req, res) => {
-    pokemonModel.find({ id: req.body.id })
+    await pokemonModel.find({ id: req.body.id })
         .then(pokeDoc => {
             if (pokeDoc.length > 0) {
                 // res.send({ errMsg: "Pokemon with that ID already exists." })
@@ -155,7 +155,7 @@ app.post('/api/v1/pokemon', asyncWrapper(async (req, res) => {
 // - upsert a whole pokemon document
 app.put('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
     const { _id, ...rest } = req.body;
-    pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true, upsert: true }, function (err, doc) {
+    await pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true, upsert: true }, function (err, doc) {
         if (err) {
             throw new PokemonBadRequest(err);
             // res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
@@ -168,7 +168,7 @@ app.put('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
 // - patch a pokemon document or a portion of the pokemon document
 app.patch('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
     const { _id, ...rest } = req.body;
-    pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true }, function (err, doc) {
+    await pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true }, function (err, doc) {
         if (err) {
             throw new PokemonBadRequest();
             // res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
@@ -180,7 +180,7 @@ app.patch('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
 
 // - delete a pokemon 
 app.delete('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
-    pokemonModel.find({ id: req.params.id })
+    await pokemonModel.find({ id: req.params.id })
         .then(pokeDoc => {
             if (pokeDoc.length > 0) {
                 pokemonModel.deleteOne({ id: req.params.id }, function (err, result) {
@@ -377,7 +377,7 @@ app.delete('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
 //     res.send({ msg: "Updated pokemon." })
 // })
 
-app.get('*', asyncWrapper(async (req, res) => {
+app.get('*', (req, res) => {
     // res.send({ errMsg: "Improper route. Check API docs plz." })
     throw new PokemonNoSuchRoute();
-}))
+})
