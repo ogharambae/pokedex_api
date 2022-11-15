@@ -80,19 +80,6 @@ app.listen(process.env.PORT || port, async () => {
     }
 })
 
-const auth = (req, res, next) => {
-    const token = req.header("auth-token");
-    if (!token) {
-        throw new PokemonBadRequest("Access denied.");
-    }
-    try {
-        const verified = jwt.verify(token, process.env.TOKEN_SECRET);
-        next();
-    } catch (err) {
-        throw new PokemonBadRequest("Invalid token.")
-    }
-}
-
 app.use(express.json())
 
 // register a user with encrypted data
@@ -120,6 +107,19 @@ app.post('/login', asyncWrapper(async (req, res) => {
     res.header("auth-token", token);
     res.send(user);
 }))
+
+const auth = (req, res, next) => {
+    const token = req.header("auth-token");
+    if (!token) {
+        throw new PokemonBadRequest("Access denied.");
+    }
+    try {
+        const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+        next();
+    } catch (err) {
+        throw new PokemonBadRequest("Invalid token.")
+    }
+}
 
 app.use(auth)
 
@@ -216,7 +216,7 @@ app.patch('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
     const { _id, ...rest } = req.body;
     await pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true }, function (err, doc) {
         if (err) {
-            throw new PokemonBadRequest();
+            throw new PokemonBadRequest(err);
             // res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
         } else {
             res.json({ msg: "Pokemon updated successfully.", data: doc })
