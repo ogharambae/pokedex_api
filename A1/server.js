@@ -15,6 +15,7 @@ const {
 const dotenv = require("dotenv")
 const userModel = require("./userModel")
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 
 dotenv.config();
 const app = express()
@@ -79,6 +80,19 @@ app.listen(process.env.PORT || port, async () => {
     }
 })
 
+const auth = (req, res, next) => {
+    const token = req.header("auth-token");
+    if (!token) {
+        throw new PokemonBadRequest("Access denied.");
+    }
+    try {
+        const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+        next();
+    } catch (err) {
+        throw new PokemonBadRequest("Invalid token.")
+    }
+}
+
 app.use(express.json())
 
 // register a user with encrypted data
@@ -91,6 +105,7 @@ app.post('/register', asyncWrapper(async (req, res) => {
     res.send(user);
 }))
 
+// login for a user
 app.post('/login', asyncWrapper(async (req, res) => {
     const { username, password } = req.body;
     const user = await userModel.findOne({ username });
@@ -101,8 +116,12 @@ app.post('/login', asyncWrapper(async (req, res) => {
     if (!isPWCorrect) {
         throw new PokemonBadRequest("Password is incorrect.");
     }
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+    res.header("auth-token", token);
     res.send(user);
 }))
+
+app.use(auth)
 
 // - get all the pokemons after the 10th. List only Two.
 app.get('/api/v1/pokemons', asyncWrapper(async (req, res) => {
