@@ -1,4 +1,4 @@
 node_modules
 thunder-collection_Pokemonds.json
 thunder-collection_Pokemons.json
-auth.env
+.env
