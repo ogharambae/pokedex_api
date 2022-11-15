@@ -12,7 +12,11 @@ const {
     PokemonNoSuchRoute,
     PokemonNotFoundWithID
 } = require("./errors")
+const dotenv = require("dotenv")
+const userModel = require("./userModel")
+const bcrypt = require("bcrypt")
 
+dotenv.config();
 const app = express()
 const port = 5000
 
@@ -20,7 +24,7 @@ let pokemonModel = null;
 
 app.listen(process.env.PORT || port, async () => {
     try {
-        await mongoose.connect('mongodb+srv://hyunbae:BK2FeIG9GpvBFiTj@cluster0.cnjwrfq.mongodb.net/a1?retryWrites=true&w=majority')
+        await mongoose.connect(process.env.DB_STRING);
         await mongoose.connection.db.dropCollection("pokemons");
 
         const pokeRes = await axios.get("https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/pokedex.json")
@@ -76,6 +80,29 @@ app.listen(process.env.PORT || port, async () => {
 })
 
 app.use(express.json())
+
+// register a user with encrypted data
+app.post('/register', asyncWrapper(async (req, res) => {
+    const { username, password, email } = req.body;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPW = await bcrypt.hash(password, salt);
+    const userWithHashedPW = { ...req.body, password: hashedPW };
+    const user = await userModel.create(userWithHashedPW);
+    res.send(user);
+}))
+
+app.post('/login', asyncWrapper(async (req, res) => {
+    const { username, password } = req.body;
+    const user = await userModel.findOne({ username });
+    if (!user) {
+        throw new PokemonBadRequest("User not found.");
+    }
+    const isPWCorrect = await bcrypt.compare(password, user.password);
+    if (!isPWCorrect) {
+        throw new PokemonBadRequest("Password is incorrect.");
+    }
+    res.send(user);
+}))
 
 // - get all the pokemons after the 10th. List only Two.
 app.get('/api/v1/pokemons', asyncWrapper(async (req, res) => {
