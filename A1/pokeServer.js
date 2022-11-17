@@ -2,6 +2,8 @@ const express = require("express")
 const mongoose = require("mongoose")
 const axios = require("axios")
 const { asyncWrapper } = require("./asyncWrapper")
+const { connectDB } = require("./connectDB")
+const cookieParser = require("cookie-parser");
 const {
     PokemonBadRequest,
     PokemonNotFound,
@@ -14,7 +16,6 @@ const {
 } = require("./errors")
 const dotenv = require("dotenv")
 const userModel = require("./userModel")
-const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 
 dotenv.config();
@@ -23,10 +24,23 @@ const port = 5000
 
 let pokemonModel = null;
 
-app.listen(process.env.PORT || port, async () => {
+// const start = asyncWrapper(async () => {
+//     await connectDB();
+//     await populatePokemon();
+
+//     app.listen(process.env.PORT, (err) => {
+//         if (err) {
+//             throw new PokemonDb(err);
+//         } else {
+//             console.log("All is working well!");
+//         }
+//     })
+// })
+// start();
+
+app.listen(process.env.pokeServerPort || port, async () => {
     try {
-        await mongoose.connect(process.env.DB_STRING);
-        await mongoose.connection.db.dropCollection("pokemons");
+        await connectDB();
 
         const pokeRes = await axios.get("https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/pokedex.json")
         if (!pokeRes || !pokeRes.data || pokeRes.status != 200) {
@@ -72,45 +86,24 @@ app.listen(process.env.PORT || port, async () => {
                 "Speed": Number
             }
         })
-        pokemonModel = mongoose.model('pokemons', pokemonSchema);
-
+        pokemonModel = await mongoose.model('pokemons', pokemonSchema);
         await pokemonModel.create(pokemonData)
+
     } catch (error) {
         throw new PokemonDb(error);
     }
 })
 
 app.use(express.json())
+app.use(cookieParser())
 
-// register a user with encrypted data
-app.post('/register', asyncWrapper(async (req, res) => {
-    const { username, password, email } = req.body;
-    const salt = await bcrypt.genSalt(10);
-    const hashedPW = await bcrypt.hash(password, salt);
-    const userWithHashedPW = { ...req.body, password: hashedPW };
-    const user = await userModel.create(userWithHashedPW);
-    res.send(user);
-}))
-
-// login for a user
-app.post('/login', asyncWrapper(async (req, res) => {
-    const { username, password } = req.body;
-    const user = await userModel.findOne({ username });
-    if (!user) {
-        throw new PokemonBadRequest("User not found.");
-    }
-    const isPWCorrect = await bcrypt.compare(password, user.password);
-    if (!isPWCorrect) {
-        throw new PokemonBadRequest("Password is incorrect.");
-    }
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-    res.header("auth-token", token);
-    res.send(user);
-}))
-
-const auth = (req, res, next) => {
-    const token = req.header("auth-token");
-    if (!token) {
+const auth = asyncWrapper(async (req, res, next) => {
+    // get out the token from cookie
+    // find the user that has the token from the cookie in the db
+    // if there is a match then allow access, else no access
+    const token = req.cookies.auth_token;
+    const userFound = await userModel.findOne({ token: token });
+    if (!userFound) {
         throw new PokemonBadRequest("Access denied.");
     }
     try {
@@ -119,7 +112,7 @@ const auth = (req, res, next) => {
     } catch (err) {
         throw new PokemonBadRequest("Invalid token.")
     }
-}
+})
 
 app.use(auth)
 
