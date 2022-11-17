@@ -47,7 +47,7 @@ Content-Type: application/json
 
 ###
 GET http://localhost:5000/api/v1/pokemon/808
-auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1YjFjMWIzMDI5OTYyNjI1ZmVjMjciLCJpYXQiOjE2Njg2NjMzNjZ9.-Q6YdaLqDw1F-jmPmh5gPPcAudZBp4_fJZz_eU1jyQM
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1Y2E4YjMzMWExZmVlYzQ3Y2FiMTUiLCJpYXQiOjE2Njg2NjQxMTR9.T1NwEWVM7QYMXEZDbRoCiRp4Vdgw723oaxN3-9VUZsw
 
 ###
 GET http://localhost:5000/api/v1/pokemonImage/1

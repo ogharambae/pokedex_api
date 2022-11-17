@@ -85,6 +85,10 @@ app.use(express.json())
 app.use(cookieParser())
 
 const auth = asyncWrapper(async (req, res, next) => {
+    const authToken = req.cookies.auth_token;
+    if (!authToken) {
+        throw new PokemonBadRequest("Access denied.");
+    }
     try {
         const token = req.header("auth_token");
         const userFound = await userModel.findOne({ token: token });
