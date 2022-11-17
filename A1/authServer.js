@@ -58,19 +58,9 @@ app.post('/login', asyncWrapper(async (req, res) => {
     res.send(user);
 }))
 
-const auth = asyncWrapper(async (req, res, next) => {
-    // get out the token from cookie
-    // find the user that has the token from the cookie in the db
-    // if there is a match then allow access, else no access
-    const token = req.cookies.auth_token;
-    const userFound = await userModel.findOne({ token: token });
-    if (!userFound) {
-        throw new PokemonBadRequest("Access denied.");
-    }
-    try {
-        const verified = jwt.verify(token, process.env.TOKEN_SECRET);
-        next();
-    } catch (err) {
-        throw new PokemonBadRequest("Invalid token.")
-    }
+// Logout and clear a token
+app.get("/logout", asyncWrapper(async (req, res) => {
+    res.clearCookie("token");
+    res.json({ Message: "Logged out" });
 })
+);
