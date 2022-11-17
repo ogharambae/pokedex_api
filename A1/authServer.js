@@ -60,7 +60,7 @@ app.post('/login', asyncWrapper(async (req, res) => {
 
 // Logout and clear a token
 app.get("/logout", asyncWrapper(async (req, res) => {
-    res.clearCookie("token");
+    res.clearCookie("auth_token");
     res.json({ Message: "Logged out" });
 })
 );
