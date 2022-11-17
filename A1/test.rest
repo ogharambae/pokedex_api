@@ -46,8 +46,8 @@ Content-Type: application/json
 
 
 ###
-GET http://localhost:5000/api/v1/pokemon/2
-auth_token: .eyJfaWQiOiI2Mzc1YjBlNmJiOGU0YTIyMWIxOWEwNGUiLCJpYXQiOjE2Njg2NjE2MTh9.j8188RLRVXm4H4e3VzA2E4CpYnVLrfR5KCqcCH32Ftw
+GET http://localhost:5000/api/v1/pokemon/808
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1YjFjMWIzMDI5OTYyNjI1ZmVjMjciLCJpYXQiOjE2Njg2NjMzNjZ9.-Q6YdaLqDw1F-jmPmh5gPPcAudZBp4_fJZz_eU1jyQM
 
 ###
 GET http://localhost:5000/api/v1/pokemonImage/1
@@ -55,8 +55,8 @@ auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1YjFjMWIzMDI5OTY
 
 
 ###
-PUT http://localhost:5000/api/v1/pokemon/809
-auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1YjFjMWIzMDI5OTYyNjI1ZmVjMjciLCJpYXQiOjE2Njg2NjI2NzJ9.a2v1yKPt544qCQxqfkWHYkdO6PDFDm9PzyZc2VmyaeU
+PATCH  http://localhost:5000/api/v1/pokemon/1
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1YjFjMWIzMDI5OTYyNjI1ZmVjMjciLCJpYXQiOjE2Njg2NjMzNjZ9.-Q6YdaLqDw1F-jmPmh5gPPcAudZBp4_fJZz_eU1jyQM
 Content-Type: application/json
 
 {
@@ -82,4 +82,5 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:5000/api/v1/pokemon/809
+DELETE http://localhost:5000/api/v1/pokemon/777
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1YjFjMWIzMDI5OTYyNjI1ZmVjMjciLCJpYXQiOjE2Njg2NjMzNjZ9.-Q6YdaLqDw1F-jmPmh5gPPcAudZBp4_fJZz_eU1jyQM

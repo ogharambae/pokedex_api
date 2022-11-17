@@ -203,15 +203,21 @@ app.put('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
 
 // - patch a pokemon document or a portion of the pokemon document
 app.patch('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
-    const { _id, ...rest } = req.body;
-    await pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true }, function (err, doc) {
-        if (err) {
-            throw new PokemonBadRequest(err);
-            // res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
-        } else {
-            res.json({ msg: "Pokemon updated successfully.", data: doc })
-        }
-    });
+    const selection = { id: req.params.id }
+    const update = req.body
+    const options = {
+        new: true,
+        runValidators: true
+    }
+    const doc = await pokemonModel.findOneAndUpdate(selection, update, options)
+    if (doc) {
+        res.json({
+            msg: "Pokemon patched Successfully.",
+            pokeInfo: doc
+        })
+    } else {
+        throw new PokemonNotFound();
+    }
 }))
 
 // - delete a pokemon 
