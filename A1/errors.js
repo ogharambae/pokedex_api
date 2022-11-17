@@ -69,6 +69,15 @@ class PokemonNotFoundWithID extends PokemonNotFound {
     }
 }
 
+class PokemonNoAdminAccess extends PokemonBadRequest {
+    constructor(message) {
+        super(message);
+        this.name = "PokemonNoAdminAccess";
+        this.message = "Error: you do not have admin access to access the route.";
+        this.errorCode = 500;
+    }
+}
+
 module.exports = {
     PokemonBadRequest,
     PokemonNotFound,
@@ -77,5 +86,6 @@ module.exports = {
     PokemonDuplicate,
     PokemonMissingID,
     PokemonNoSuchRoute,
-    PokemonNotFoundWithID
+    PokemonNotFoundWithID,
+    PokemonNoAdminAccess
 }

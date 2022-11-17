@@ -29,6 +29,10 @@ const schema = new mongoose.Schema({
     },
     token: {
         type: String
+    },
+    is_admin: {
+        type: String,
+        default: "false"
     }
 })
 

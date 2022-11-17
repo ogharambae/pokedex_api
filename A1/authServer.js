@@ -48,19 +48,23 @@ app.post('/login', asyncWrapper(async (req, res) => {
     if (!isPWCorrect) {
         throw new PokemonBadRequest("Password is incorrect.");
     }
-    // create a cookie
-    // attach token to cookie
-    // assign the token to the user in mongodb
+    // create a cookie, attach token to cookie, assign the token to the user in mongodb
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+    if (user.is_admin == "true") { // if admin, set is_admin to "true"
+        res.cookie("is_admin", "true");
+    } else {
+        res.cookie("is_admin", "false");
+    }
     res.cookie("auth_token", token, { maxAge: 2 * 60 * 60 * 1000 });
+    res.header("auth_token", token);
     await userModel.findOneAndUpdate({ username }, { token: token });
-    // res.header("auth-token", token);
     res.send(user);
 }))
 
 // Logout and clear a token
 app.get("/logout", asyncWrapper(async (req, res) => {
     res.clearCookie("auth_token");
-    res.json({ Message: "Logged out" });
+    res.clearCookie("is_admin");
+    res.json({ Message: "You have been successfully logged out." });
 })
 );

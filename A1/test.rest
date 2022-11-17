@@ -2,9 +2,21 @@ POST http://localhost:6000/register
 Content-Type: application/json
 
 {
-  "username": "test11",
-  "password": "test",
+  "username": "user",
+  "password": "user",
   "email": "test@test.ca"
+}
+
+###
+
+POST http://localhost:6000/register
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin",
+  "email": "admin@test.ca",
+  "is_admin": true
 }
 
 ###
@@ -13,11 +25,61 @@ POST http://localhost:6000/login
 Content-Type: application/json
 
 {
-  "username": "test11",
-  "password": "test"
+  "username": "user",
+  "password": "user"
+}
+
+
+###
+POST http://localhost:6000/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+
+###
+GET http://localhost:6000/logout
+Content-Type: application/json
+
+
+###
+GET http://localhost:5000/api/v1/pokemon/2
+auth_token: .eyJfaWQiOiI2Mzc1YjBlNmJiOGU0YTIyMWIxOWEwNGUiLCJpYXQiOjE2Njg2NjE2MTh9.j8188RLRVXm4H4e3VzA2E4CpYnVLrfR5KCqcCH32Ftw
+
+###
+GET http://localhost:5000/api/v1/pokemonImage/1
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1YjFjMWIzMDI5OTYyNjI1ZmVjMjciLCJpYXQiOjE2Njg2NjIyMDl9.qCDIYZgZsG9SgqUsC_VmbOe2_O72wK0DG7L_6XgewAM
+
+
+###
+PUT http://localhost:5000/api/v1/pokemon/809
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1YjFjMWIzMDI5OTYyNjI1ZmVjMjciLCJpYXQiOjE2Njg2NjI2NzJ9.a2v1yKPt544qCQxqfkWHYkdO6PDFDm9PzyZc2VmyaeU
+Content-Type: application/json
+
+{
+    "name": {
+      "english": "test",
+      "japanese": "test",
+      "chinese": "test",
+      "french": "test"
+    },
+    "base": {
+      "HP": 60,
+      "Attack": 20,
+      "Defense": 55,
+      "Speed": 30,
+      "Speed Attack": 25,
+      "Speed Defense": 25
+    },
+    "id": 1000,
+    "type": [
+      "Bug"
+    ],
+    "__v": 0
 }
 
 ###
-
-GET http://localhost:5000/api/v1/pokemon/2
-auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1OTU1M2E5Mjk2ZmNlYjUzZmIyYjMiLCJpYXQiOjE2Njg2NTAzMjd9.gyB5fQbymGliAc3135S1rLfIu0SNbUOdR7o-QSJ8Qjc
+DELETE http://localhost:5000/api/v1/pokemon/809

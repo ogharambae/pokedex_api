@@ -12,7 +12,8 @@ const {
     PokemonDuplicate,
     PokemonMissingID,
     PokemonNoSuchRoute,
-    PokemonNotFoundWithID
+    PokemonNotFoundWithID,
+    PokemonNoAdminAccess
 } = require("./errors")
 const dotenv = require("dotenv")
 const userModel = require("./userModel")
@@ -23,20 +24,6 @@ const app = express()
 const port = 5000
 
 let pokemonModel = null;
-
-// const start = asyncWrapper(async () => {
-//     await connectDB();
-//     await populatePokemon();
-
-//     app.listen(process.env.PORT, (err) => {
-//         if (err) {
-//             throw new PokemonDb(err);
-//         } else {
-//             console.log("All is working well!");
-//         }
-//     })
-// })
-// start();
 
 app.listen(process.env.pokeServerPort || port, async () => {
     try {
@@ -98,24 +85,27 @@ app.use(express.json())
 app.use(cookieParser())
 
 const auth = asyncWrapper(async (req, res, next) => {
-    // get out the token from cookie
-    // find the user that has the token from the cookie in the db
-    // if there is a match then allow access, else no access
-    const token = req.cookies.auth_token;
-    const userFound = await userModel.findOne({ token: token });
-    if (!userFound) {
-        throw new PokemonBadRequest("Access denied.");
-    }
     try {
-        const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+        const token = req.header("auth_token");
+        const userFound = await userModel.findOne({ token: token });
+        if (!userFound) {
+            throw new PokemonBadRequest("Access denied.");
+        }
         next();
     } catch (err) {
         throw new PokemonBadRequest("Invalid token.")
     }
 })
 
-app.use(auth)
+const isAdmin = asyncWrapper(async (req, res, next) => {
+    const adminAccess = req.cookies.is_admin;
+    if (adminAccess != "true") {
+        throw new PokemonNoAdminAccess();
+    }
+    next();
+})
 
+app.use(auth)
 // - get all the pokemons after the 10th. List only Two.
 app.get('/api/v1/pokemons', asyncWrapper(async (req, res) => {
     let query = pokemonModel.find({}).sort('id');
@@ -155,6 +145,8 @@ app.get('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
         })
 }))
 
+
+app.use(isAdmin)
 // - get a pokemon Image URL
 app.get('/api/v1/pokemonImage/:id', asyncWrapper(async (req, res) => {
     if (!req.params.id) {
@@ -193,15 +185,20 @@ app.post('/api/v1/pokemon', asyncWrapper(async (req, res) => {
 
 // - upsert a whole pokemon document
 app.put('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
-    const { _id, ...rest } = req.body;
-    await pokemonModel.findOneAndUpdate({ id: req.params.id }, { $set: { ...rest } }, { runValidators: true, upsert: true }, function (err, doc) {
-        if (err) {
-            throw new PokemonBadRequest(err);
-            // res.send({ errMsg: "ValidationError: check your values to see if they match the specifications of the schema." })
-        } else {
-            res.json({ msg: "Pokemon upserted successfully.", data: doc })
-        }
-    });
+    const selection = { id: req.params.id }
+    const update = req.body
+    const options = {
+        new: true,
+        runValidators: true,
+        overwrite: true
+    }
+    const doc = await pokemonModel.findOneAndUpdate(selection, update, options);
+    console.log(doc);
+    if (doc) {
+        res.json({ msg: "Pokemon upserted successfully.", data: doc })
+    } else {
+        throw new PokemonBadRequest();
+    }
 }))
 
 // - patch a pokemon document or a portion of the pokemon document
