@@ -18,7 +18,7 @@ function Pagination({ numPages, currentPage, setCurrentPage }) {
 
     return (
         <div>
-            <button onClick={previousPage}>Prev</button>
+            {(currentPage !== 1) && <button onClick={previousPage}>Prev</button>}
             {
                 pageNum.map((num) => {
                     return <>
@@ -26,7 +26,7 @@ function Pagination({ numPages, currentPage, setCurrentPage }) {
                     </>
                 })
             }
-            <button onClick={nextPage}>Prev</button>
+            {(currentPage !== numPages) && <button onClick={nextPage}>Next</button>}
         </div>
     )
 }
