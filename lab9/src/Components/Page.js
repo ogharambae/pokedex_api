@@ -1,4 +1,5 @@
 import React from 'react'
+import Pokemon from './Pokemon'
 
 function Page({ currentPage, currentPokemons }) {
     return (
@@ -8,10 +9,17 @@ function Page({ currentPage, currentPokemons }) {
             </h2>
             {
                 currentPokemons.map((item) => {
-                    return <div>{item.name.english} id is {item.id}</div>
+                    return <div>
+                        <div className="pokeId">
+                            {item.name.english} id is {item.id}
+                        </div>
+                        <div className="pokeImg">
+                            <Pokemon pokemon={item} />
+                        </div>
+                    </div>
                 })
             }
-        </div>
+        </div >
     )
 }
 
