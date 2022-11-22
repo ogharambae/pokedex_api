@@ -10,10 +10,10 @@ function Page({ currentPage, currentPokemons }) {
             {
                 currentPokemons.map((item) => {
                     return <div>
-                        <div className="pokeId">
+                        <div>
                             {item.name.english} id is {item.id}
                         </div>
-                        <div className="pokeImg">
+                        <div>
                             <Pokemon pokemon={item} />
                         </div>
                     </div>
