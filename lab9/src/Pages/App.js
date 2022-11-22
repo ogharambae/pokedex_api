@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Page from "../Components/Page"
 import axios from "axios";
+import Pagination from "../Components/Pagination";
 
 function App() {
     useEffect(() => {
@@ -24,9 +25,10 @@ function App() {
     const numPages = Math.ceil(pokemons.length / howManyPerPage);
 
     return (
-        <div>
+        <>
             <Page currentPage={currentPage} currentPokemons={currentPokemons} />
-        </div>
+            <Pagination numPages={numPages} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        </>
     )
 }
 
