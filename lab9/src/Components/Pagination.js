@@ -21,11 +21,12 @@ function Pagination({ numPages, currentPage, setCurrentPage }) {
             {(currentPage !== 1) && <button onClick={previousPage}>Prev</button>}
             {
                 pageNum.map((num) => {
-                    if (num < currentPage + 5 && num > currentPage - 5) {
+                    if (num < currentPage + 6 && num > currentPage - 5) {
                         return <>
-                            <button onClick={() => { setCurrentPage(num) }}>{num}</button>
+                            <button onClick={() => { setCurrentPage(num) }} className={(num === currentPage) ? "currentPageBtn" : ""} >{num}</button>
                         </>
                     }
+                    return <></>
                 })
             }
             {(currentPage !== numPages) && <button onClick={nextPage}>Next</button>}
