@@ -1,33 +1,26 @@
-import React, { useEffect, useState } from "react";
-import Page from "../Components/Page"
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import Pagination from "../Components/Pagination";
+import SearchBar from "../Components/SearchBar";
+import FilteredPagination from "../Components/FilteredPagination";
 
 function App() {
+    const types = useRef([]);
+    const [checkedState, setCheckedState] = useState([]);
+    console.log(checkedState);
+
     useEffect(() => {
-        axios.get("https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/pokedex.json")
-            .then((d) => d.data)
-            .then((d) => {
-                setPokemons(d);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+        async function getTypes() {
+            const result = await axios.get("https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/types.json");
+            types.current = result.data.map(type => type.english);
+            setCheckedState(new Array(result.data.length).fill(false))
+        }
+        getTypes();
     }, [])
-
-    const [pokemons, setPokemons] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-
-    const howManyPerPage = 10;
-    const indexLowerBound = currentPage * howManyPerPage;
-    const indexUpperBound = indexLowerBound - howManyPerPage;
-    const currentPokemons = pokemons.slice(indexUpperBound, indexLowerBound)
-    const numPages = Math.ceil(pokemons.length / howManyPerPage);
 
     return (
         <>
-            <Page currentPage={currentPage} currentPokemons={currentPokemons} />
-            <Pagination numPages={numPages} currentPage={currentPage} setCurrentPage={setCurrentPage} />
+            <SearchBar types={types} checkedState={checkedState} setCheckedState={setCheckedState} />
+            <FilteredPagination types={types} checkedState={checkedState} />
         </>
     )
 }
