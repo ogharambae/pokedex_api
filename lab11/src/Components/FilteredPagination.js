@@ -20,7 +20,7 @@ function FilteredPagination({ types, checkedState }) {
             .then(res => {
                 setPokemons(res)
             })
-            .catch(err => console.log("err", err))
+            .catch(err => console.log(err))
     }, [checkedState])
 
     const indexLowerBound = currentPage * howManyPerPage
