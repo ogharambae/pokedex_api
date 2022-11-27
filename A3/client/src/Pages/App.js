@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import SearchBar from "../Components/SearchBar";
-import FilteredPagination from "../Components/FilteredPagination";
+import SearchBar from "../components/SearchBar";
+import FilteredPagination from "../components/FilteredPagination";
 
 function App() {
   const types = useRef([]);
@@ -21,6 +21,7 @@ function App() {
     <>
       <SearchBar types={types} checkedState={checkedState} setCheckedState={setCheckedState} />
       <FilteredPagination types={types} checkedState={checkedState} />
+
     </>
   )
 }
