@@ -1,9 +1,9 @@
+const { connectDB } = require("./database/connectDB");
+const { populatePokemons } = require("./database/populatePokemons");
+const { getTypes } = require("./database/getTypes");
+const { asyncWrapper } = require("./utility/asyncWrapper");
+const userModel = require("./database/userModel");
 const express = require("express");
-const { connectDB } = require("./database/connectDB.js");
-const { populatePokemons } = require("./database/populatePokemons.js");
-const { getTypes } = require("./database/getTypes.js");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
 const {
   PokemonBadRequest,
   PokemonBadRequestMissingID,
@@ -12,10 +12,10 @@ const {
   PokemonDuplicateError,
   PokemonNoSuchRouteError,
   PokemonAuthError
-} = require("./utility/errors.js");
-const { asyncWrapper } = require("./utility/asyncWrapper.js");
+} = require("./utility/errors");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
-const userModel = require("./database/userModel.js");
 
 dotenv.config();
 const app = express();

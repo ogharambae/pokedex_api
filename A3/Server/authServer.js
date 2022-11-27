@@ -1,14 +1,14 @@
-const express = require("express");
-const { asyncWrapper } = require("./asyncWrapper.js");
-const dotenv = require("dotenv");
-const userModel = require("./userModel.js");
-const { connectDB } = require("./connectDB.js");
-const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
+const { asyncWrapper } = require("./utility/asyncWrapper");
+const userModel = require("./database/userModel.js");
+const { connectDB } = require("./database/connectDB");
 const {
   PokemonBadRequest,
   PokemonDbError,
-} = require("./errors.js");
+} = require("./utility/errors");
+const cookieParser = require("cookie-parser");
+const express = require("express");
+const dotenv = require("dotenv");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const app = express();
 dotenv.config();
