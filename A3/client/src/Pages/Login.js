@@ -49,20 +49,27 @@ const Login = () => {
     };
 
     const loginUser = async () => {
-        try {
+        if (!input.username) {
+            setCredentialError("Username field is empty.")
+        } else if (!input.password) {
+            setCredentialError("Password field is empty.")
+        } else {
             const API_URL = "http://localhost:5000";
-            const { data } = await axios.post(`${API_URL}/login`, input, {
+            const { data: resData } = await axios.post(`${API_URL}/login`, input, {
                 withCredentials: true
             });
-            console.log(data);
-            if (data) {
+            console.log(resData)
+            console.log("msg: " + resData.msg);
+            console.log("errorCode: " + resData.errorCode);
+            console.log(resData);
+
+            if (!resData.errorCode && resData) {
                 setCredentialError(false);
                 navigate("/home");
+            } else {
+                setCredentialError(resData.msg);
             }
-        } catch (err) {
-            console.log(err);
         }
-
     };
 
     return (
