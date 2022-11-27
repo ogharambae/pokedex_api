@@ -6,13 +6,20 @@ const {
   PokemonDbError,
 } = require("./utility/errors");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const express = require("express");
 const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const session = require("express-session");
 const app = express();
-dotenv.config();
 
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true
+}
+dotenv.config();
+const cookieTTL = 100 * 60 * 60 * 8;
 
 const start = asyncWrapper(async () => {
   await connectDB({ "drop": false });
@@ -30,9 +37,22 @@ const start = asyncWrapper(async () => {
 })
 start();
 
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(express.json());
+app.use(cors(corsOptions));
+app.use(session({
+  secret: "thisIsASecretCode",
+  saveUninitialized: true,
+  cookie: { maxAge: cookieTTL },
+  resave: false
+}));
 
+// check if session is currently valid
+app.get("/authUser", async (req, res) => {
+  res.json({ error: 0, data: req.session });
+});
+
+// registers user
 app.post('/register', asyncWrapper(async (req, res) => {
   const { username, password, email } = req.body;
   const salt = await bcrypt.genSalt(10);
@@ -44,6 +64,9 @@ app.post('/register', asyncWrapper(async (req, res) => {
 
 // login for a user
 app.post('/login', asyncWrapper(async (req, res) => {
+
+  console.log("inside login call");
+
   const { username, password } = req.body;
   const user = await userModel.findOne({ username });
   if (!user) {
@@ -61,9 +84,12 @@ app.post('/login', asyncWrapper(async (req, res) => {
     res.cookie("is_admin", "false");
   }
   res.cookie("auth_token", token, { maxAge: 2 * 60 * 60 * 1000 });
-  res.header("auth_token", token);
+  const header = res.header("auth_token", token);
   await userModel.findOneAndUpdate({ username }, { token: token });
-  res.send(user);
+
+  res.send({
+    data: user
+  });
 }))
 
 // Logout and clear a token
@@ -71,5 +97,4 @@ app.get("/logout", asyncWrapper(async (req, res) => {
   res.clearCookie("auth_token");
   res.clearCookie("is_admin");
   res.json({ Message: "You have been successfully logged out." });
-})
-);
+}));

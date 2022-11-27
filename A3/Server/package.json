@@ -2,7 +2,7 @@
   "name": "a1",
   "version": "1.0.0",
   "description": "Build a Restful API to serve Pokémons data.",
-  "main": "appCleaned.js",
+  "main": "pokeServer.js",
   "dependencies": {
     "accepts": "^1.3.8",
     "array-flatten": "^1.1.1",
@@ -28,6 +28,7 @@
     "escape-html": "^1.0.3",
     "etag": "^1.8.1",
     "express": "^4.18.1",
+    "express-session": "^1.17.3",
     "finalhandler": "^1.2.0",
     "forwarded": "^0.2.0",
     "fresh": "^0.5.2",

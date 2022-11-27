@@ -17,6 +17,12 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true
+}
+
+
 dotenv.config();
 const app = express();
 var pokeModel = null;
@@ -65,7 +71,7 @@ const isAdmin = asyncWrapper(async (req, res, next) => {
   next();
 })
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(auth);
 
 // get all the pokemons after the 10th. List only Two.
