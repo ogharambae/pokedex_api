@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { Grid, Box } from "@mui/material";
-
+import SearchBar from "../Components/SearchBar";
+import FilteredPagination from "../Components/FilteredPagination";
 
 function App() {
   const types = useRef([]);
@@ -18,12 +18,11 @@ function App() {
   }, [])
 
   return (
-    <Grid container spacing={0}>
-      <Box>
-        Hello World
-      </Box>
-    </Grid>
-  );
+    <>
+      <SearchBar types={types} checkedState={checkedState} setCheckedState={setCheckedState} />
+      <FilteredPagination types={types} checkedState={checkedState} />
+    </>
+  )
 }
 
-export default App;
+export default App
