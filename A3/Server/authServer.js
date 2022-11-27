@@ -64,32 +64,42 @@ app.post('/register', asyncWrapper(async (req, res) => {
 
 // login for a user
 app.post('/login', asyncWrapper(async (req, res) => {
-
-  console.log("inside login call");
-
   const { username, password } = req.body;
   const user = await userModel.findOne({ username });
-  if (!user) {
-    throw new PokemonBadRequest("User not found.");
-  }
-  const isPWCorrect = await bcrypt.compare(password, user.password);
-  if (!isPWCorrect) {
-    throw new PokemonBadRequest("Password is incorrect.");
-  }
-  // create a cookie, attach token to cookie, assign the token to the user in mongodb
-  const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-  if (user.is_admin == "true") { // if admin, set is_admin to "true"
-    res.cookie("is_admin", "true");
-  } else {
-    res.cookie("is_admin", "false");
-  }
-  res.cookie("auth_token", token, { maxAge: 2 * 60 * 60 * 1000 });
-  const header = res.header("auth_token", token);
-  await userModel.findOneAndUpdate({ username }, { token: token });
 
-  res.send({
-    data: user
-  });
+  if (!user) {
+    res.send({
+      data: username,
+      msg: "No user found with username " + username,
+      errorCode: 500
+    })
+    // throw new PokemonBadRequest("User not found.");
+  } else {
+    const isPWCorrect = await bcrypt.compare(password, user.password);
+    if (!isPWCorrect) {
+      res.send({
+        data: username,
+        msg: "Password is incorrect.",
+        errorCode: 501
+      })
+      // throw new PokemonBadRequest("Password is incorrect.");
+    } else {
+      // create a cookie, attach token to cookie, assign the token to the user in mongodb
+      const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
+      if (user.is_admin == "true") { // if admin, set is_admin to "true"
+        res.cookie("is_admin", "true");
+      } else {
+        res.cookie("is_admin", "false");
+      }
+      res.cookie("auth_token", token, { maxAge: 2 * 60 * 60 * 1000 });
+      const header = res.header("auth_token", token);
+      await userModel.findOneAndUpdate({ username }, { token: token });
+
+      res.send({
+        data: user
+      });
+    }
+  }
 }))
 
 // Logout and clear a token
