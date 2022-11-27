@@ -1,14 +1,14 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Box, TextField, Typography, Button, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { Box, TextField, Typography, Button, Grid, ThemeProvider } from "@mui/material";
-import ErrorMessage from "../utility/ErrorMessage";
-
-// Style
 import { createTheme } from "@mui/material/styles";
-import bgImage from "../assets/images/poke-background.jpg";
-import "./Login.css";
+import { ThemeProvider } from "@mui/material";
 import axios from "axios";
+
+import "./Login.css";
+import ValidateRegister from "../utility/ValidateRegister";
+import SuccessDialog from "../components/SuccessDialog";
+import bgImage from "../assets/images/poke-background.jpg";
 
 export const customTheme = createTheme({
     typography: {
@@ -16,7 +16,7 @@ export const customTheme = createTheme({
     }
 });
 
-const Login = () => {
+const Signup = () => {
     const navigate = useNavigate();
 
     const loginPageStyle = {
@@ -27,15 +27,21 @@ const Login = () => {
         height: "100vh",
         width: "100%",
         top: 0,
-        left: 0
+        left: 0,
+        overflow: "scroll",
+        paddingBottom: "5%"
     };
-
-    const [credentialError, setCredentialError] = useState(false);
 
     const [input, setInput] = useState({
         username: "",
-        password: ""
+        email: "",
+        password: "",
+        confirmPassword: ""
     });
+
+    const [errors, setErrors] = useState({});
+    const [isValid, setValid] = useState(false);
+    const [response, setResponse] = useState(false);
 
     const changeHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
@@ -43,28 +49,36 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        loginUser();
-    };
+        setErrors(ValidateRegister(input));
 
-    const loginUser = async () => {
-        if (!input.username) {
-            setCredentialError("Username field is empty.")
-        } else if (!input.password) {
-            setCredentialError("Password field is empty.")
-        } else {
+        if (!Object.entries(ValidateRegister(input)).length) {
             const API_URL = "http://localhost:5000";
-            const { data: resData } = await axios.post(`${API_URL}/login`, input, {
+            const { resData } = axios.post(`${API_URL}/register`, input, {
                 withCredentials: true
             });
 
+            console.log(resData)
+            console.log("msg: " + resData.msg);
+            console.log("errorCode: " + resData.errorCode);
+            console.log(resData);
+
             if (!resData.errorCode && resData) {
-                setCredentialError(false);
-                navigate("/home");
+                setValid(true);
             } else {
-                setCredentialError(resData.msg);
+                setResponse(true);
+                setValid(true);
             }
+            setValid(false);
+            setResponse(false);
         }
     };
+
+    useEffect(() => { }, [
+        input.email,
+        input.username,
+        input.password,
+        input.confirmPassword
+    ]);
 
     return (
         <div className="Login-component" style={loginPageStyle}>
@@ -77,14 +91,9 @@ const Login = () => {
                     justifyContent="center">
                     <Typography
                         variant="h1"
-                        fontFamily={"Pokemon Solid"}
                         paddingTop={5}
                         fontWeight="bold">
-                        Pokemon API
-                    </Typography>
-
-                    <Typography variant="h5" fontFamily={"Pokemon Solid"}>
-                        Welcome to my Pokemon inputbase!
+                        Pokemon API Signup
                     </Typography>
                 </Box>
 
@@ -102,13 +111,26 @@ const Login = () => {
                     <TextField
                         margin="normal"
                         type={"text"}
+                        name="email"
+                        variant="outlined"
+                        placeholder="First name"
+                        style={{ width: 300, height: 40 }}
+                        value={input.email}
+                        onChange={changeHandler}
+                    />
+                    {errors.email && <p className="error">{errors.email}</p>}
+
+                    <TextField
+                        margin="normal"
+                        type={"text"}
                         name="username"
                         variant="outlined"
                         placeholder="Username"
-                        style={{ width: 300, height: 50 }}
+                        style={{ width: 300, height: 40 }}
                         value={input.username}
                         onChange={changeHandler}
                     />
+                    {errors.username && <p className="error">{errors.username}</p>}
 
                     <TextField
                         margin="normal"
@@ -116,37 +138,51 @@ const Login = () => {
                         type={"password"}
                         variant="outlined"
                         placeholder="Password"
-                        style={{ width: 300, height: 50 }}
+                        style={{ width: 300, height: 40 }}
                         value={input.password}
                         onChange={changeHandler}
                     />
+                    {errors.password && <p className="error">{errors.password}</p>}
+
+                    <TextField
+                        margin="normal"
+                        name="confirmPassword"
+                        type={"password"}
+                        variant="outlined"
+                        placeholder="Confirm Password"
+                        style={{ width: 300, height: 40 }}
+                        value={input.confirmPassword}
+                        onChange={changeHandler}
+                    />
+                    {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+
                     <Button
                         sx={{ marginTop: 3 }}
                         variant="contained"
                         type="submit"
                         onClick={handleSubmit}>
-                        Login
+                        Signup
                     </Button>
+
                     <Grid container>
                         <Grid item xs={1}></Grid>
-                        <Grid item xs={7} display="flex" alignItems={"center"}>
-                            <Typography>Don&apos;t have an account?</Typography>
+                        <Grid item xs={7} pt={1}>
+                            <Typography>Already have an account?</Typography>
                         </Grid>
 
-                        <Grid item xs={4}>
+                        <Grid item xs={3} pt={1}>
                             <Button
                                 onClick={() => {
-                                    navigate("/");
+                                    navigate("/login");
                                 }}>
-                                Sign Up
+                                Login
                             </Button>
                         </Grid>
-                        {credentialError && <ErrorMessage msg={credentialError} />}
                     </Grid>
                 </Box>
+                {isValid && <SuccessDialog isDuplicate={response} />}
             </ThemeProvider>
         </div>
     );
 };
-
-export default Login;
+export default Signup;
