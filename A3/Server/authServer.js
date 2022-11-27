@@ -3,7 +3,8 @@ const { asyncWrapper } = require("./asyncWrapper.js");
 const dotenv = require("dotenv");
 const userModel = require("./userModel.js");
 const { connectDB } = require("./connectDB.js");
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const {
   PokemonBadRequest,
   PokemonDbError,
