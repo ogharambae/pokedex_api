@@ -38,6 +38,7 @@ start();
 app.use(express.json());
 app.use(cookieParser());
 
+// authentication logic
 const auth = asyncWrapper(async (req, res, next) => {
   const authToken = req.cookies.auth_token;
   if (!authToken) {
@@ -51,10 +52,11 @@ const auth = asyncWrapper(async (req, res, next) => {
     }
     next();
   } catch (err) {
-    throw new PokemonAuthError("Invalid token.")
+    throw new PokemonAuthError("Invalid token.");
   }
 })
 
+// logic to check if current user is admin
 const isAdmin = asyncWrapper(async (req, res, next) => {
   const adminAccess = req.cookies.is_admin;
   if (adminAccess != "true") {
