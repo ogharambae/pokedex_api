@@ -1,10 +1,9 @@
-const mongoose = require("mongoose");
 const express = require("express");
 const { connectDB } = require("./connectDB.js");
 const { populatePokemons } = require("./populatePokemons.js");
 const { getTypes } = require("./getTypes.js");
-const morgan = require("morgan");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const {
   PokemonBadRequest,
   PokemonBadRequestMissingID,
@@ -17,8 +16,8 @@ const {
 const { asyncWrapper } = require("./asyncWrapper.js");
 const dotenv = require("dotenv");
 const userModel = require("./userModel.js");
-dotenv.config();
 
+dotenv.config();
 const app = express();
 var pokeModel = null;
 
@@ -37,44 +36,39 @@ const start = asyncWrapper(async () => {
 start();
 
 app.use(express.json());
-const jwt = require("jsonwebtoken");
+app.use(cookieParser());
 
-const authUser = asyncWrapper(async (req, res, next) => {
-  // const to ken = req.header('auth-token')
-  const token = req.query.appid;
-  if (!token) {
-    throw new PokemonAuthError("No Token: Please provide an appid query parameter.");
+const auth = asyncWrapper(async (req, res, next) => {
+  const authToken = req.cookies.auth_token;
+  if (!authToken) {
+    throw new PokemonAuthError("Access denied.");
   }
-
-  const userWithToken = await userModel.findOne({ token });
-  if (!userWithToken || userWithToken.token_invalid) {
-    throw new PokemonAuthError("Please Login.");
-  }
-
   try {
-    const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+    const token = req.header("auth_token");
+    const userFound = await userModel.findOne({ token: token });
+    if (!userFound) {
+      throw new PokemonAuthError("Access denied.");
+    }
     next();
   } catch (err) {
-    throw new PokemonAuthError("Invalid user.");
+    throw new PokemonAuthError("Invalid token.")
   }
 })
 
 const isAdmin = asyncWrapper(async (req, res, next) => {
-  const user = await userModel.findOne({ token: req.query.appid });
-  if (user.role !== "admin") {
-    throw new PokemonAuthError("Access denied");
+  const adminAccess = req.cookies.is_admin;
+  if (adminAccess != "true") {
+    throw new PokemonAuthError("You do not have admin access.");
   }
   next();
 })
 
-// app.use(morgan("tiny"))
-app.use(morgan(":method"))
-app.use(cors())
-app.use(authUser)
+app.use(cors());
+app.use(auth);
 
 // get all the pokemons after the 10th. List only Two.
 app.get('/api/v1/pokemons', asyncWrapper(async (req, res) => {
-  let query = pokemonModel.find({}).sort('id');
+  let query = pokeModel.find({}).sort('id');
   if (req.query.after) {
     query = query.skip(req.query.after);
   }
@@ -95,7 +89,7 @@ app.get('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
   if (!req.params.id) {
     throw new PokemonMissingID();
   }
-  await pokemonModel.find({ id: req.params.id })
+  await pokeModel.find({ id: req.params.id })
     .then(pokeDoc => {
       if (pokeDoc.length > 0) {
         res.json(pokeDoc)
@@ -108,8 +102,7 @@ app.get('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
     })
 }))
 
-app.use(isAdmin)
-
+app.use(isAdmin);
 app.get('/api/v1/pokemonImage/:id', asyncWrapper(async (req, res) => {
   if (!req.params.id) {
     throw new PokemonBadRequestMissingID();
