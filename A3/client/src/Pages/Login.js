@@ -84,7 +84,7 @@ const Login = () => {
                     </Typography>
 
                     <Typography variant="h5" fontFamily={"Pokemon Solid"}>
-                        Welcome to my Pokemon inputbase!
+                        Welcome to my Pokemon database!
                     </Typography>
                 </Box>
 
