@@ -19,7 +19,7 @@ export const customTheme = createTheme({
 const Signup = () => {
     const navigate = useNavigate();
 
-    const loginPageStyle = {
+    const registerPageStyle = {
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -76,7 +76,7 @@ const Signup = () => {
     ]);
 
     return (
-        <div className="Login-component" style={loginPageStyle}>
+        <div className="Login-component" style={registerPageStyle}>
             <ThemeProvider theme={customTheme}>
                 <Box
                     sx={{ mt: 10 }}
