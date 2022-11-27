@@ -14,14 +14,14 @@ const schema = new mongoose.Schema({
     required: true,
     trim: true,
     min: 6,
-    max: 1000,
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      min: 3
-    }
+    max: 1000
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    min: 3
   },
   date: {
     type: Date,
