@@ -1,7 +1,7 @@
 const express = require("express");
-const { connectDB } = require("./connectDB.js");
-const { populatePokemons } = require("./populatePokemons.js");
-const { getTypes } = require("./getTypes.js");
+const { connectDB } = require("./database/connectDB.js");
+const { populatePokemons } = require("./database/populatePokemons.js");
+const { getTypes } = require("./database/getTypes.js");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const {
@@ -12,10 +12,10 @@ const {
   PokemonDuplicateError,
   PokemonNoSuchRouteError,
   PokemonAuthError
-} = require("./errors.js");
-const { asyncWrapper } = require("./asyncWrapper.js");
+} = require("./utility/errors.js");
+const { asyncWrapper } = require("./utility/asyncWrapper.js");
 const dotenv = require("dotenv");
-const userModel = require("./userModel.js");
+const userModel = require("./database/userModel.js");
 
 dotenv.config();
 const app = express();
