@@ -7,7 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-export default function AlertDialog(props) {
+export default function AlertDialog({ isDuplicate, setValid, setResponse }) {
     const [open, setOpen] = React.useState(true);
 
     const handleClose = () => {
@@ -21,6 +21,8 @@ export default function AlertDialog(props) {
     }
 
     const remainAtCurrent = () => {
+        setValid(false);
+        setResponse(false);
         setOpen(false);
     }
 
@@ -33,15 +35,15 @@ export default function AlertDialog(props) {
                 aria-describedby="alert-dialog-description"
             >
                 <DialogTitle id="alert-dialog-title">
-                    {props.isDuplicate ? "Username is already in use." : "You have signed up successfully!"}
+                    {isDuplicate ? "Username is already in use." : "You have signed up successfully!"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        {props.isDuplicate ? "Please provide another username." : "You may now log in using your credentials!"}
+                        {isDuplicate ? "Please provide another username." : "You may now log in using your credentials!"}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={props.isDuplicate ? remainAtCurrent : redirectToLogin} autoFocus>
+                    <Button onClick={isDuplicate ? remainAtCurrent : redirectToLogin} autoFocus>
                         Ok
                     </Button>
                 </DialogActions>

@@ -47,19 +47,27 @@ app.use(session({
   resave: false
 }));
 
-// check if session is currently valid
-app.get("/authUser", async (req, res) => {
-  res.json({ error: 0, data: req.session });
-});
-
 // registers user
 app.post('/register', asyncWrapper(async (req, res) => {
   const { username, password, email } = req.body;
-  const salt = await bcrypt.genSalt(10);
-  const hashedPW = await bcrypt.hash(password, salt);
-  const userWithHashedPW = { ...req.body, password: hashedPW };
-  const user = await userModel.create(userWithHashedPW);
-  res.send(user);
+  const checkUser = await userModel.findOne({ username });
+  if (checkUser) {
+    // console.log("sending invalid response...");
+    res.send({
+      data: username,
+      msg: "Account with that username already exists.",
+      errorCode: 101
+    })
+  } else {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPW = await bcrypt.hash(password, salt);
+    const userWithHashedPW = { ...req.body, password: hashedPW };
+    const user = await userModel.create(userWithHashedPW);
+    // console.log(user);
+    res.send({
+      data: user
+    });
+  }
 }))
 
 // login for a user
@@ -94,7 +102,7 @@ app.post('/login', asyncWrapper(async (req, res) => {
       res.cookie("auth_token", token, { maxAge: 2 * 60 * 60 * 1000 });
       const header = res.header("auth_token", token);
       await userModel.findOneAndUpdate({ username }, { token: token });
-
+      console.log(user);
       res.send({
         data: user
       });

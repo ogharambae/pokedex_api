@@ -33,10 +33,10 @@ const Signup = () => {
     };
 
     const [input, setInput] = useState({
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: ""
+        username: "testUser",
+        email: "test@test.com",
+        password: "password",
+        confirmPassword: "password"
     });
 
     const [errors, setErrors] = useState({});
@@ -47,29 +47,24 @@ const Signup = () => {
         setInput({ ...input, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors(ValidateRegister(input));
 
         if (!Object.entries(ValidateRegister(input)).length) {
             const API_URL = "http://localhost:5000";
-            const { resData } = axios.post(`${API_URL}/register`, input, {
+            await axios.post(`${API_URL}/register`, input, {
                 withCredentials: true
+            }).then(({ data: resData }) => {
+                if (!resData.errorCode && resData) {
+                    setValid(true);
+                } else {
+                    setResponse(true);
+                    setValid(true);
+                }
             });
-
-            console.log(resData)
-            console.log("msg: " + resData.msg);
-            console.log("errorCode: " + resData.errorCode);
-            console.log(resData);
-
-            if (!resData.errorCode && resData) {
-                setValid(true);
-            } else {
-                setResponse(true);
-                setValid(true);
-            }
-            setValid(false);
-            setResponse(false);
+            // setValid(false);
+            // setResponse(false);
         }
     };
 
@@ -90,7 +85,7 @@ const Signup = () => {
                     alignItems="center"
                     justifyContent="center">
                     <Typography
-                        variant="h1"
+                        variant="h2"
                         paddingTop={5}
                         fontWeight="bold">
                         Pokemon API Signup
@@ -108,17 +103,6 @@ const Signup = () => {
                     marginTop={5}
                     padding={3}
                     backgroundColor="rgba(125, 216, 255, 0.8)">
-                    <TextField
-                        margin="normal"
-                        type={"text"}
-                        name="email"
-                        variant="outlined"
-                        placeholder="First name"
-                        style={{ width: 300, height: 40 }}
-                        value={input.email}
-                        onChange={changeHandler}
-                    />
-                    {errors.email && <p className="error">{errors.email}</p>}
 
                     <TextField
                         margin="normal"
@@ -131,6 +115,18 @@ const Signup = () => {
                         onChange={changeHandler}
                     />
                     {errors.username && <p className="error">{errors.username}</p>}
+
+                    <TextField
+                        margin="normal"
+                        type={"text"}
+                        name="email"
+                        variant="outlined"
+                        placeholder="Email"
+                        style={{ width: 300, height: 40 }}
+                        value={input.email}
+                        onChange={changeHandler}
+                    />
+                    {errors.email && <p className="error">{errors.email}</p>}
 
                     <TextField
                         margin="normal"
@@ -149,7 +145,7 @@ const Signup = () => {
                         name="confirmPassword"
                         type={"password"}
                         variant="outlined"
-                        placeholder="Confirm Password"
+                        placeholder="Confirm password"
                         style={{ width: 300, height: 40 }}
                         value={input.confirmPassword}
                         onChange={changeHandler}
@@ -180,7 +176,7 @@ const Signup = () => {
                         </Grid>
                     </Grid>
                 </Box>
-                {isValid && <SuccessDialog isDuplicate={response} />}
+                {isValid && <SuccessDialog isDuplicate={response} setValid={setValid} setResponse={setResponse} />}
             </ThemeProvider>
         </div>
     );

@@ -136,7 +136,7 @@ const Login = () => {
                         <Grid item xs={4}>
                             <Button
                                 onClick={() => {
-                                    navigate("/");
+                                    navigate("/register");
                                 }}>
                                 Sign Up
                             </Button>
