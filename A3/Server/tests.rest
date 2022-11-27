@@ -1,0 +1,85 @@
+POST http://localhost:6000/register
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "user",
+  "email": "test@test.ca"
+}
+
+###
+
+POST http://localhost:6000/register
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin",
+  "email": "admin@test.ca",
+  "is_admin": true
+}
+
+###
+
+POST http://localhost:6000/login
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "user"
+}
+
+
+###
+POST http://localhost:6000/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+
+###
+GET http://localhost:6000/logout
+Content-Type: application/json
+
+
+###
+GET http://localhost:5000/api/v1/pokemon/789
+auth_token: thisisaninvalidtoken.eyJfaWQiOiI2Mzc1ZDJkMzU5OTg3Y2FjZmRhNGZjY2IiLCJpYXQiOjE2Njg2NjYxODR9.B6jgw-R00gi37BIDrBAl99cVVoI2YVLnQ3dzXvLZ2mw
+
+###
+GET http://localhost:5000/api/v1/pokemonImage/1
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1ZDJmNDU5OTg3Y2FjZmRhNGZjY2YiLCJpYXQiOjE2Njg2NjYxMTN9.UU_dm5l8gwN6Ue_kwKtH9Kctgu7GhjnExbXGy_ihB9E
+
+###
+PATCH  http://localhost:5000/api/v1/pokemon/123
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1ZDJmNDU5OTg3Y2FjZmRhNGZjY2YiLCJpYXQiOjE2Njg2NjYxMTN9.UU_dm5l8gwN6Ue_kwKtH9Kctgu7GhjnExbXGy_ihB9E
+Content-Type: application/json
+
+{
+    "name": {
+      "english": "test",
+      "japanese": "test",
+      "chinese": "test",
+      "french": "test"
+    },
+    "base": {
+      "HP": 60,
+      "Attack": 20,
+      "Defense": 55,
+      "Speed": 30,
+      "Speed Attack": 25,
+      "Speed Defense": 25
+    },
+    "id": 1000,
+    "type": [
+      "Bug"
+    ],
+    "__v": 0
+}
+
+###
+DELETE http://localhost:5000/api/v1/pokemon/456
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc1ZDJmNDU5OTg3Y2FjZmRhNGZjY2YiLCJpYXQiOjE2Njg2NjYxMTN9.UU_dm5l8gwN6Ue_kwKtH9Kctgu7GhjnExbXGy_ihB9E
