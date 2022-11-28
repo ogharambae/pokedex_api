@@ -12,7 +12,6 @@ function FilteredPagination({ types, checkedState }) {
         axios.get('https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/pokedex.json')
             .then((d) => (d).data)
             .then((d) => {
-                console.log(checkedState);
                 d = (d.filter((pokemon) => checkedState.every((checked, i) => !checked || pokemon.type.includes(types.current[i]))
                 ));
                 return d;
