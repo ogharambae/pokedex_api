@@ -100,6 +100,7 @@ app.post('/login', asyncWrapper(async (req, res) => {
         res.cookie("is_admin", "false");
       }
       res.cookie("auth_token", token, { maxAge: 2 * 60 * 60 * 1000 });
+      res.cookie("username", username);
       const header = res.header("auth_token", token);
       await userModel.findOneAndUpdate({ username }, { token: token });
       console.log(user);

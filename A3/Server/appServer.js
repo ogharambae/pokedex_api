@@ -3,6 +3,7 @@ const { populatePokemons } = require("./database/populatePokemons");
 const { getTypes } = require("./database/getTypes");
 const { asyncWrapper } = require("./utility/asyncWrapper");
 const userModel = require("./database/userModel");
+const apiStatUserModel = require("./database/apiStatUserModel");
 const express = require("express");
 const {
   PokemonBadRequest,
@@ -13,6 +14,8 @@ const {
   PokemonNoSuchRouteError,
   PokemonAuthError
 } = require("./utility/errors");
+
+const morgan = require("morgan");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
@@ -56,6 +59,7 @@ const auth = asyncWrapper(async (req, res, next) => {
     if (!userFound) {
       throw new PokemonAuthError("Access denied.");
     }
+    morgan.token('username', (req, res) => { return JSON.stringify(req.cookies['username']) })
     next();
   } catch (err) {
     throw new PokemonAuthError("Invalid token.");
@@ -70,6 +74,49 @@ const isAdmin = asyncWrapper(async (req, res, next) => {
   }
   next();
 })
+
+// morgan implementation here
+const logUniqueAPIUsers = async (username) => {
+  try {
+    const match = await apiStatUserModel.findOne({
+      date: new Date().toISOString().substring(0, 10)
+    })
+    if (match) {
+      let counted = false;
+      match.stats.forEach((u, index) => {
+        if (u.user == username) {
+          match.stats[index].apiAccessCount += 1;
+          counted = true;
+        }
+      });
+      if (!counted) {
+        match.stats.push({
+          user: username
+        });
+      }
+      match.save();
+    } else {
+      await apiUserStaModel.create({
+        stats: [
+          {
+            user: username,
+          }
+        ]
+      })
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+app.use(morgan((token, req, res) => {
+  console.log(req.cookies);
+  let username = req.cookies["username"];
+  let endpoint = token.url(req);
+
+  // console.log(endpoint);
+  logUniqueAPIUsers(username);
+}));
 
 app.use(cors(corsOptions));
 app.use(auth);

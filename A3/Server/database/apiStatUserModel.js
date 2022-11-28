@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose')
 
-const apiStatUserSchema = new mongoose.Schema({
+const apiUserStatSchema = new mongoose.Schema({
     date: {
         type: String,
         default: new Date().toISOString().substring(0, 10)
@@ -14,4 +14,4 @@ const apiStatUserSchema = new mongoose.Schema({
     }]
 });
 
-module.exports = mongoose.model('apiStat', apiStatUserSchema) //apiStat is the name of the collection in the db
+module.exports = mongoose.model('apiUserStat', apiUserStatSchema) //apiStat is the name of the collection in the db
