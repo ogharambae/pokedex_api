@@ -46,12 +46,12 @@ Content-Type: application/json
 
 
 ###
-GET http://localhost:8000/api/v1/pokemon/1
-auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzgyYzZiZGU5N2Q4MmE3ZmJiMDgxMDIiLCJpYXQiOjE2Njk2MDQ5NzB9.bb8MduC9kJUtEUELPC7FPq3apfAwNV0l2wUudkWqAjU
+GET http://localhost:8000/api/v1/pokemon/7
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzgyYzJmMjBkNTg3NDdkMGJiYzcyNmEiLCJpYXQiOjE2Njk2MTExNzN9.45dKgg1jl3VMwgW9cCMC8w4Jvqeka7dAc8Le88zJwwY
 
 ###
 GET http://localhost:8000/api/v1/pokemonImage/1
-auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzgyYzZiZGU5N2Q4MmE3ZmJiMDgxMDIiLCJpYXQiOjE2Njk1MTQ5NTJ9.PtbhSO2iUg9UrPdPmzzJUUkYy4jRhNSII5piyI4kiZs
+auth_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzgyYzZiZGU5N2Q4MmE3ZmJiMDgxMDIiLCJpYXQiOjE2Njk2MTEwNzV9.Ul7urMH_Lh6XmSJ8k_5_3fJh0Trb05_IGB7SKGSeIYQ
 
 ###
 PATCH  http://localhost:8000/api/v1/pokemon/123

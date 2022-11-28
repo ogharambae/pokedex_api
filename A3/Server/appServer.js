@@ -3,8 +3,8 @@ const { populatePokemons } = require("./database/populatePokemons");
 const { getTypes } = require("./database/getTypes");
 const { asyncWrapper } = require("./utility/asyncWrapper");
 const userModel = require("./database/userModel");
-const apiStatUserModel = require("./database/apiStatUserModel");
 const express = require("express");
+const { logUniqueAPIUsers, logTopUserByEndpoint, logRouteAccess } = require("./utility/loggerLogic");
 const {
   PokemonBadRequest,
   PokemonBadRequestMissingID,
@@ -75,47 +75,22 @@ const isAdmin = asyncWrapper(async (req, res, next) => {
   next();
 })
 
-// morgan implementation here
-const logUniqueAPIUsers = async (username) => {
-  try {
-    const match = await apiStatUserModel.findOne({
-      date: new Date().toISOString().substring(0, 10)
-    })
-    if (match) {
-      let counted = false;
-      match.stats.forEach((u, index) => {
-        if (u.user == username) {
-          match.stats[index].apiAccessCount += 1;
-          counted = true;
-        }
-      });
-      if (!counted) {
-        match.stats.push({
-          user: username
-        });
-      }
-      match.save();
-    } else {
-      await apiUserStaModel.create({
-        stats: [
-          {
-            user: username,
-          }
-        ]
-      })
-    }
-  } catch (err) {
-    console.log(err);
+app.use(morgan((token, req, res, next) => {
+  let usernameStringified = token.username(req);
+  let username = usernameStringified.replace(/\"/g, "");
+
+  console.log(username);
+  if (!username) {
+    return next();
   }
-}
 
-app.use(morgan((token, req, res) => {
-  console.log(req.cookies);
-  let username = req.cookies["username"];
-  let endpoint = token.url(req);
+  let endpoint = token.url(req, res);
+  let method = token.method(req, res);
+  let status = token.status(req, res);
 
-  // console.log(endpoint);
   logUniqueAPIUsers(username);
+  logTopUserByEndpoint(endpoint, username);
+  logRouteAccess(endpoint, status, method);
 }));
 
 app.use(cors(corsOptions));
