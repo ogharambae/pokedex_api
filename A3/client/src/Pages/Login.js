@@ -1,14 +1,12 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, TextField, Typography, Button, Grid, ThemeProvider } from "@mui/material";
-import ErrorMessage from "../utility/ErrorMessage";
-
-// Style
 import { createTheme } from "@mui/material/styles";
+import axios from "axios";
+
+import ErrorMessage from "../utility/ErrorMessage";
 import bgImage from "../assets/images/poke-background.jpg";
 import "./Login.css";
-import axios from "axios";
 
 export const customTheme = createTheme({
     typography: {
@@ -41,7 +39,7 @@ const Login = () => {
         setInput({ ...input, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const submitHandler = (e) => {
         e.preventDefault();
         loginUser();
     };
@@ -56,10 +54,14 @@ const Login = () => {
             const { data: resData } = await axios.post(`${API_URL}/login`, input, {
                 withCredentials: true
             });
-
             if (!resData.errorCode && resData) {
-                setCredentialError(false);
-                navigate("/home");
+                if (resData.data.is_admin == "true") {
+                    setCredentialError(false);
+                    navigate("/admin");
+                } else {
+                    setCredentialError(false);
+                    navigate("/home");
+                }
             } else {
                 setCredentialError(resData.msg);
             }
@@ -124,7 +126,7 @@ const Login = () => {
                         sx={{ marginTop: 3 }}
                         variant="contained"
                         type="submit"
-                        onClick={handleSubmit}>
+                        onClick={submitHandler}>
                         Login
                     </Button>
                     <Grid container>

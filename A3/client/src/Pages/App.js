@@ -1,14 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+
 import SearchBar from "../components/SearchBar";
 import FilteredPagination from "../components/FilteredPagination";
-
 import bgImage from "../assets/images/pokedex-background.jpg";
+import LogoutButton from "../components/LogoutButton"
+
 
 function App() {
   const types = useRef([]);
   const [checkedState, setCheckedState] = useState([]);
-  console.log(checkedState);
 
   const appPageStyle = {
     backgroundImage: `url(${bgImage})`,
@@ -34,9 +35,9 @@ function App() {
 
   return (
     <div className="Login-component" style={appPageStyle}>
+      <LogoutButton />
       <SearchBar types={types} checkedState={checkedState} setCheckedState={setCheckedState} />
       <FilteredPagination types={types} checkedState={checkedState} />
-
     </div>
   )
 }
