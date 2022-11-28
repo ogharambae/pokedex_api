@@ -75,14 +75,9 @@ const isAdmin = asyncWrapper(async (req, res, next) => {
   next();
 })
 
-app.use(morgan((token, req, res, next) => {
-  let usernameStringified = token.username(req);
+app.use(morgan(async (token, req, res) => {
+  let usernameStringified = token.username(req, res);
   let username = usernameStringified.replace(/\"/g, "");
-
-  console.log(username);
-  if (!username) {
-    return next();
-  }
 
   let endpoint = token.url(req, res);
   let method = token.method(req, res);
@@ -147,7 +142,6 @@ app.get('/api/v1/pokemonImage/:id', asyncWrapper(async (req, res) => {
 
 // create a new pokemon
 app.post('/api/v1/pokemon/', asyncWrapper(async (req, res) => {
-  console.log(req.body);
   if (!req.body.id) {
     throw new PokemonBadRequestMissingID();
   }

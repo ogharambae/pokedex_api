@@ -52,7 +52,6 @@ app.post('/register', asyncWrapper(async (req, res) => {
   const { username, password, email } = req.body;
   const checkUser = await userModel.findOne({ username });
   if (checkUser) {
-    // console.log("sending invalid response...");
     res.send({
       data: username,
       msg: "Account with that username already exists.",
@@ -63,7 +62,6 @@ app.post('/register', asyncWrapper(async (req, res) => {
     const hashedPW = await bcrypt.hash(password, salt);
     const userWithHashedPW = { ...req.body, password: hashedPW };
     const user = await userModel.create(userWithHashedPW);
-    // console.log(user);
     res.send({
       data: user
     });
@@ -103,7 +101,6 @@ app.post('/login', asyncWrapper(async (req, res) => {
       res.cookie("username", username);
       const header = res.header("auth_token", token);
       await userModel.findOneAndUpdate({ username }, { token: token });
-      console.log(user);
       res.send({
         data: user
       });
