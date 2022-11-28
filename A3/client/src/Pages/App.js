@@ -1,11 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
+import { createTheme } from "@mui/material/styles";
 import axios from "axios";
+import { Box, TextField, Typography, Button, Grid, ThemeProvider } from "@mui/material";
 
 import SearchBar from "../components/SearchBar";
 import FilteredPagination from "../components/FilteredPagination";
 import bgImage from "../assets/images/pokedex-background.jpg";
 import LogoutButton from "../components/LogoutButton"
 
+
+export const customTheme = createTheme({
+  typography: {
+    fontFamily: "PixGamer"
+  }
+});
 
 function App() {
   const types = useRef([]);
@@ -35,9 +43,11 @@ function App() {
 
   return (
     <div className="Login-component" style={appPageStyle}>
-      <LogoutButton />
-      <SearchBar types={types} checkedState={checkedState} setCheckedState={setCheckedState} />
-      <FilteredPagination types={types} checkedState={checkedState} />
+      <ThemeProvider theme={customTheme}>
+        <LogoutButton />
+        <SearchBar types={types} checkedState={checkedState} setCheckedState={setCheckedState} />
+        <FilteredPagination types={types} checkedState={checkedState} />
+      </ThemeProvider>
     </div>
   )
 }

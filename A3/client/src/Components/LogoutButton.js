@@ -22,7 +22,7 @@ const LogoutButton = () => {
     }
 
     return (
-        <Button variant="contained" onClick={buttonHandler} >Logout</Button>
+        <Button variant="contained" style={{ fontSize: "18px", fontWeight: "bolder" }} onClick={buttonHandler} >Logout</Button>
     )
 }
 
