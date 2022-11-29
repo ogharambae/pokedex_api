@@ -44,9 +44,22 @@ function App() {
   return (
     <div className="Login-component" style={appPageStyle}>
       <ThemeProvider theme={customTheme}>
-        <LogoutButton />
-        <SearchBar types={types} checkedState={checkedState} setCheckedState={setCheckedState} />
+        <Box
+          sx={{ mt: 10 }}
+          display={"flex"}
+          flexDirection={"column"}
+          alignItems="center"
+          justifyContent="center">
+          <SearchBar types={types} checkedState={checkedState} setCheckedState={setCheckedState} />
+        </Box>
         <FilteredPagination types={types} checkedState={checkedState} />
+        <Grid
+          container
+          justifyContent={"center"}
+          sx={{ mt: 2 }}
+        >
+          <LogoutButton />
+        </Grid>
       </ThemeProvider>
     </div>
   )

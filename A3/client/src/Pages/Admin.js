@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { createTheme } from "@mui/material/styles";
 import { ThemeProvider, Box, Typography } from "@mui/material";
 
@@ -13,8 +12,6 @@ export const customTheme = createTheme({
 });
 
 const Admin = () => {
-    const navigate = useNavigate();
-
     const loginPageStyle = {
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",

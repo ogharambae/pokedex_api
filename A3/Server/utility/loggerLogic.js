@@ -23,7 +23,7 @@ const logUniqueAPIUsers = async (username) => {
             }
             match.save();
         } else {
-            await apiUserStaModel.create({
+            await apiStatUserModel.create({
                 stats: [
                     {
                         user: username,
