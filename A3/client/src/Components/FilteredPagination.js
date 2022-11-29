@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import Page from "./Page";
 import Pagination from './Pagination';
 import axios from "axios";
-import { Box, Typography, Grid } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 
 function FilteredPagination({ types, checkedState }) {

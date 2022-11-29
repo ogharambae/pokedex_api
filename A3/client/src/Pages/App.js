@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { createTheme } from "@mui/material/styles";
 import axios from "axios";
-import { Box, TextField, Typography, Button, Grid, ThemeProvider } from "@mui/material";
+import { Box, Grid, ThemeProvider } from "@mui/material";
 
 import SearchBar from "../components/SearchBar";
 import FilteredPagination from "../components/FilteredPagination";
