@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react"
 import Page from "./Page";
 import Pagination from './Pagination';
 import axios from "axios";
+import { Box, Typography, Grid } from "@mui/material";
+
 
 function FilteredPagination({ types, checkedState }) {
     const [pokemons, setPokemons] = useState([]);
@@ -9,18 +11,24 @@ function FilteredPagination({ types, checkedState }) {
     const howManyPerPage = 10;
 
     useEffect(() => {
-        axios.get('https://raw.githubusercontent.com/fanzeyi/pokemon.json/master/pokedex.json')
-            .then((d) => (d).data)
-            .then((d) => {
-                d = (d.filter((pokemon) => checkedState.every((checked, i) => !checked || pokemon.type.includes(types.current[i]))
-                ));
-                return d;
+        async function getPokemons() {
+            const API_URL = "http://localhost:8000/api/v1"
+            await axios.get(`${API_URL}/pokemons`, {
+                withCredentials: true
             })
-            .then((d) => {
-                setPokemons((d));
-            })
-            .catch(err => console.log(err))
-    }, [checkedState]);
+                .then((d) => (d).data)
+                .then((d) => {
+                    d = (d.filter((pokemon) => checkedState.every((checked, i) => !checked || pokemon.type.includes(types.current[i]))
+                    ));
+                    return d;
+                })
+                .then((d) => {
+                    setPokemons((d));
+                })
+                .catch(err => console.log(err))
+        }
+        getPokemons();
+    }, [checkedState, types]);
 
     const indexLowerBound = currentPage * howManyPerPage;
     const indexUpperBound = indexLowerBound - howManyPerPage;
@@ -28,14 +36,35 @@ function FilteredPagination({ types, checkedState }) {
     const numPages = Math.ceil(pokemons.length) / howManyPerPage;;
 
     return (
-        <>
-            < Page currentPage={currentPage} currentPokemons={currentPokemons} />
-            < Pagination
-                numPages={numPages}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-            />
-        </>
+        <div>
+            <Box
+                display={"flex"}
+                flexDirection={"column"}
+                alignItems="center"
+                justifyContent="center">
+                <Typography
+                    variant="h2"
+                    fontFamily={"PixGamer"}
+                    fontWeight="bold">
+                    Page number {currentPage}
+                </Typography>
+            </Box>
+            <Box
+                display={"flex"}>
+                <Page currentPokemons={currentPokemons} />
+            </Box>
+            <Box
+                display={"flex"}
+                flexDirection={"column"}
+                alignItems="center"
+                justifyContent="center">
+                <Pagination
+                    numPages={numPages}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                />
+            </Box>
+        </div >
     )
 }
 
