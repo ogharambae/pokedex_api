@@ -4,6 +4,9 @@ const { getTypes } = require("./database/getTypes");
 const { asyncWrapper } = require("./utility/asyncWrapper");
 const userModel = require("./database/userModel");
 const express = require("express");
+const apiUserStatModel = require("./database/apiStatUserModel");
+const topUserEndpointModel = require("./database/topUserEndpointSchema");
+const routeAccessLogModel = require("./database/routeAccessLogSchema");
 const { logUniqueAPIUsers, logTopUserByEndpoint, logRouteAccess } = require("./utility/loggerLogic");
 const {
   PokemonBadRequest,
@@ -76,12 +79,12 @@ const isAdmin = asyncWrapper(async (req, res, next) => {
 })
 
 app.use(morgan(async (token, req, res) => {
-  let usernameStringified = token.username(req, res);
-  let username = usernameStringified.replace(/\"/g, "");
+  const usernameStringified = token.username(req, res);
+  const username = usernameStringified.replace(/\"/g, "");
 
-  let endpoint = token.url(req, res);
-  let method = token.method(req, res);
-  let status = token.status(req, res);
+  const endpoint = token.url(req, res);
+  const method = token.method(req, res);
+  const status = token.status(req, res);
 
   logUniqueAPIUsers(username);
   logTopUserByEndpoint(endpoint, username);
@@ -203,6 +206,17 @@ app.patch('/api/v1/pokemon/:id', asyncWrapper(async (req, res) => {
   } else {
     throw new PokemonNotFoundError("");
   }
+}))
+
+// get api stats 
+app.get('/userApi', asyncWrapper(async (req, res) => {
+  const userApiData = await apiUserStatModel.find({});
+  const userEndpointData = await topUserEndpointModel.find({});
+  const accessRouteLogs = await routeAccessLogModel.find({})
+  console.log(userApiData);
+  console.log(userEndpointData);
+  console.log(accessRouteLogs);
+  res.send({ userApiData, userEndpointData, accessRouteLogs });
 }))
 
 app.get("*", (req, res) => {
