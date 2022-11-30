@@ -10,7 +10,6 @@ function Pokemon({ pokemon }) {
         }
         return id;
     }
-    console.log(pokemon);
     return (
         <div>
             <img src={`https://github.com/fanzeyi/pokemon.json/raw/master/images/${generateId(pokemon.id)}.png`} alt={`place ${pokemon.name.english} here`} />
