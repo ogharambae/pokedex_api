@@ -213,9 +213,6 @@ app.get('/userApi', asyncWrapper(async (req, res) => {
   const userApiData = await apiUserStatModel.find({});
   const userEndpointData = await topUserEndpointModel.find({});
   const accessRouteLogs = await routeAccessLogModel.find({})
-  console.log(userApiData);
-  console.log(userEndpointData);
-  console.log(accessRouteLogs);
   res.send({ userApiData, userEndpointData, accessRouteLogs });
 }))
 
