@@ -10,7 +10,6 @@ import {
 } from "recharts";
 
 export default function App({ data }) {
-    console.log(data);
     return (
         <BarChart
             width={500}

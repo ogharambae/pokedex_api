@@ -8,7 +8,7 @@ import bgImage from "../assets/images/admin-background.jpg";
 import LogoutButton from "../components/LogoutButton";
 import UniqueApiUserChart from "../components/UniqueApiUserChart";
 import TopApiUserChart from "../components/TopApiUserChart";
-import Table from "../components/Table";
+import Table from "../components/TopEndpointUserTable";
 
 export const customTheme = createTheme({
     typography: {
@@ -107,9 +107,15 @@ const Admin = () => {
                             <Grid
                                 item
                                 xs={6}>
-                                <Table />
+                                <Typography
+                                    textAlign="center"
+                                    variant="h4"
+                                    paddingBottom={1}>
+                                    Top Users For Each Endpoint
+                                </Typography>
+                                <Table data={topUserEachEndpointData} />
                             </Grid>
-                            <Grid
+                            {/* <Grid
                                 item
                                 xs={6}>
                                 <Table />
@@ -123,7 +129,7 @@ const Admin = () => {
                                 item
                                 xs={6}>
                                 <Table />
-                            </Grid>
+                            </Grid> */}
                         </Grid>
                     </Box>
 
