@@ -8,7 +8,9 @@ import bgImage from "../assets/images/admin-background.jpg";
 import LogoutButton from "../components/LogoutButton";
 import UniqueApiUserChart from "../components/UniqueApiUserChart";
 import TopApiUserChart from "../components/TopApiUserChart";
-import Table from "../components/TopEndpointUserTable";
+import TopEndpointUserTable from "../components/TopEndpointUserTable";
+import ErrorsByEndpointTable from "../components/ErrorsByEndpointTable";
+import RecentErrorsTable from "../components/RecentErrorsTable";
 
 export const customTheme = createTheme({
     typography: {
@@ -46,6 +48,7 @@ const Admin = () => {
             setTopUserEachEndpointData(topUserEachEndpoint)
             setErrorsByEndpointData(errorsByEndpoint)
             setRecentErrorsData(recentErrors)
+            console.log(errorsByEndpoint)
         })
     }
 
@@ -106,30 +109,37 @@ const Admin = () => {
                             padding={2}>
                             <Grid
                                 item
-                                xs={6}>
+                                xs={4}>
                                 <Typography
                                     textAlign="center"
                                     variant="h4"
                                     paddingBottom={1}>
                                     Top Users For Each Endpoint
                                 </Typography>
-                                <Table data={topUserEachEndpointData} />
-                            </Grid>
-                            {/* <Grid
-                                item
-                                xs={6}>
-                                <Table />
+                                <TopEndpointUserTable data={topUserEachEndpointData} />
                             </Grid>
                             <Grid
                                 item
-                                xs={6}>
-                                <Table />
+                                xs={4}>
+                                <Typography
+                                    textAlign="center"
+                                    variant="h4"
+                                    paddingBottom={1}>
+                                    4xx Errors By Endpoint
+                                </Typography>
+                                <ErrorsByEndpointTable data={errorsByEndpointData} />
                             </Grid>
                             <Grid
                                 item
-                                xs={6}>
-                                <Table />
-                            </Grid> */}
+                                xs={4}>
+                                <Typography
+                                    textAlign="center"
+                                    variant="h4"
+                                    paddingBottom={1}>
+                                    Recent 4xx, 5xx Errors
+                                </Typography>
+                                <RecentErrorsTable data={recentErrorsData} />
+                            </Grid>
                         </Grid>
                     </Box>
 
