@@ -33,10 +33,10 @@ const Signup = () => {
     };
 
     const [input, setInput] = useState({
-        username: "testUser",
-        email: "test@test.com",
-        password: "password",
-        confirmPassword: "password"
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
     });
 
     const [errors, setErrors] = useState({});
