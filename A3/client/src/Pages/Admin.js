@@ -6,9 +6,9 @@ import axios from "axios";
 import filterData from "../utility/FilterApiData";
 import bgImage from "../assets/images/admin-background.jpg";
 import LogoutButton from "../components/LogoutButton";
-import BarChart from "../components/BarChart";
-import { MockData } from "../utility/MockData"
-import Table from "../components/Table"
+import UniqueApiUserChart from "../components/UniqueApiUserChart";
+import TopApiUserChart from "../components/TopApiUserChart";
+import Table from "../components/Table";
 
 export const customTheme = createTheme({
     typography: {
@@ -24,36 +24,28 @@ const Admin = () => {
         position: "fixed",
         height: "100vh",
         width: "100%",
+        overflow: "scroll",
         top: 0,
         left: 0
     };
 
-    const [userApiData, setUserApiData] = useState({});
-    const [userEndpointData, setUserEndpointData] = useState({});
-    const [accessRouteLogs, setAccessRouteLogs] = useState({});
-
-    const [chartData, setChartData] = useState({
-        labels: MockData.map((data) => data.year),
-        datasets: [{
-            label: "xData",
-            data: MockData.map((data) => data.xData),
-            backgroundColor: ["green", "blue"]
-        }]
-    });
+    const [uniqueApiUsersData, setUniqueApiUsersData] = useState([]);
+    const [topApiUsersData, setTopApiUsersData] = useState([]);
+    const [topUserEachEndpointData, setTopUserEachEndpointData] = useState([]);
+    const [errorsByEndpointData, setErrorsByEndpointData] = useState([]);
+    const [recentErrorsData, setRecentErrorsData] = useState([]);
 
     const getApiData = async () => {
         const API_URL = "http://localhost:8000"
         await axios.get(`${API_URL}/userApi`, {
             withCredentials: true
         }).then((response) => {
-            setUserApiData(response.data.userApiData);
-            setUserEndpointData(response.data.userEndpointData);
-            setAccessRouteLogs(response.data.accessRouteLogs);
-            console.log(response.data.userApiData)
-            console.log(response.data.userEndpointData)
-            console.log(response.data.accessRouteLogs)
-        }).then(() => {
-            filterData({ userApiData, userEndpointData, accessRouteLogs });
+            const { uniqueApiUsers, topApiUsers, topUserEachEndpoint, errorsByEndpoint, recentErrors } = filterData(response);
+            setUniqueApiUsersData(uniqueApiUsers)
+            setTopApiUsersData(topApiUsers)
+            setTopUserEachEndpointData(topUserEachEndpoint)
+            setErrorsByEndpointData(errorsByEndpoint)
+            setRecentErrorsData(recentErrors)
         })
     }
 
@@ -65,7 +57,6 @@ const Admin = () => {
         <div className="Login-component" style={loginPageStyle}>
             <ThemeProvider theme={customTheme}>
                 <Box>
-
                     <Box
                         sx={{
                             display: "flex",
@@ -89,21 +80,18 @@ const Admin = () => {
                     >
                         <Grid
                             container
-                            spacing={2}>
+                            rowSpacing={2}
+                            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+                            padding={2}>
                             <Grid
                                 item
-                                xs={4}>
-                                <BarChart chartData={chartData} />
+                                xs={6}>
+                                <UniqueApiUserChart data={uniqueApiUsersData} />
                             </Grid>
                             <Grid
                                 item
-                                xs={4}>
-                                <BarChart chartData={chartData} />
-                            </Grid>
-                            <Grid
-                                item
-                                xs={4}>
-                                <BarChart chartData={chartData} />
+                                xs={6}>
+                                <TopApiUserChart data={topApiUsersData} />
                             </Grid>
                         </Grid>
                     </Box>
@@ -113,7 +101,19 @@ const Admin = () => {
                         marginTop={2}>
                         <Grid
                             container
-                            spacing={2}>
+                            rowSpacing={2}
+                            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+                            padding={2}>
+                            <Grid
+                                item
+                                xs={6}>
+                                <Table />
+                            </Grid>
+                            <Grid
+                                item
+                                xs={6}>
+                                <Table />
+                            </Grid>
                             <Grid
                                 item
                                 xs={6}>
@@ -133,7 +133,8 @@ const Admin = () => {
                             justifyContent: "center",
                             width: "100%",
                             height: "auto",
-                            mt: 2
+                            mt: 2,
+                            mb: 2
                         }}>
                         <LogoutButton />
                     </Box>
