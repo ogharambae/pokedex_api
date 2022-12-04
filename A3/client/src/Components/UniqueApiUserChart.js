@@ -73,7 +73,7 @@ export default function App({ data }) {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="uniqueApiUsers" fill="#0000FF" />
+            <Bar dataKey="uniqueApiUsers" fill="rgba(0, 0, 255, 0.8)" />
         </BarChart>
     );
 }

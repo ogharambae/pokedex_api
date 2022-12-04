@@ -28,8 +28,8 @@ export default function App({ data }) {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="apiCount" fill="#0000FF" stackId="same" />
-            <Bar dataKey="user" fill="rgba(84, 157, 207, 0.5)" stackId="same" />
+            <Bar dataKey="apiCount" fill="rgba(21, 255, 45, 0.8)" stackId="same" />
+            <Bar dataKey="user" fill="rgba(84, 157, 207, 0.4)" stackId="same" />
         </BarChart>
     );
 }
