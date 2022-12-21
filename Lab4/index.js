@@ -1,12 +1,12 @@
 const express = require('express')
 const mongoose = require('mongoose')
-
+const bodyparser = require("body-parser");
 const app = express()
 const port = 5000
 
 app.listen(process.env.PORT || 5000, async () => {
     try {
-        await mongoose.connect('mongodb+srv://hyunbae:p3tYPk8DUzCqc5Pg@cluster0.cnjwrfq.mongodb.net/lab4?retryWrites=true&w=majority')
+        await mongoose.connect("mongodb+srv://hyunbae:BK2FeIG9GpvBFiTj@cluster0.cnjwrfq.mongodb.net/lab4?retryWrites=true&w=majority")
     } catch (error) {
         console.log('db error');
     }
@@ -27,6 +27,10 @@ const unicornSchema = new Schema({
 })
 
 const unicornModel = mongoose.model('unicorns', unicornSchema);
+
+app.use(bodyparser.urlencoded({
+    extended: true
+}));
 
 app.get('/api/v2/unicorns', (req, res) => {
     unicornModel.find({})
@@ -78,3 +82,25 @@ app.delete('/api/v2/unicorn/:id', (req, res) => {
     });
     res.send("Deleted successfully?")
 })
+
+// const m1 = (req, res, next) => {
+//     console.log("1")
+//     next()
+// }
+
+// const m3 = (req, res, next) => {
+//     next()
+//     console.log("3")
+// }
+
+function errH(err, req, res, next) {
+    console.log("err")
+    res.send("err")
+}
+
+
+app.get('/api/v2/unicornTest', async (req, res, next) => {
+    throw new Error("broken")
+})
+
+app.use(errH)

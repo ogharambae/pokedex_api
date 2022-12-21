@@ -88,12 +88,14 @@ const Admin = () => {
                             padding={2}>
                             <Grid
                                 item
-                                xs={6}>
+                                xs={6}
+                                align="center">
                                 <UniqueApiUserChart data={uniqueApiUsersData} />
                             </Grid>
                             <Grid
                                 item
-                                xs={6}>
+                                xs={6}
+                                align="center">
                                 <TopApiUserChart data={topApiUsersData} />
                             </Grid>
                         </Grid>
