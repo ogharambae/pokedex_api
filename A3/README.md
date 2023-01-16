@@ -7,7 +7,6 @@
   <li><a href="#project-status">Project Status</a></li>
   <li><a href="#built-with">Built With</a></li>
   <li><a href="#installation-and-setup-instructions">Installation and Setup</a></li>
-  <li><a href=#useful-resources>Resources</a></li>
 </ol>
 
 ## About
