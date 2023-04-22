@@ -18,7 +18,6 @@ This project is currently in development. Currently users are only able to searc
 
 ## Built With
 
-- [![Docker][docker.dev]][docker-url]
 - [![React][react.js]][react-url]
 - [![Material UI][materialui]][materialui-url]
 - [![Expressjs][expressjs]][express-url]
@@ -56,9 +55,6 @@ To view the app:
 
 [materialui]: https://img.shields.io/badge/Material_UI-4834d4?style=for-the-badge&logo=mui&logoColor=white
 [materialui-url]: https://mui.com/
-
-[docker.dev]: https://img.shields.io/badge/DOCKER-3498db?style=for-the-badge&logo=docker&logoColor=white
-[docker-url]: https://www.docker.com/
 
 [expressjs]: https://img.shields.io/badge/Express-f9ca24?style=for-the-badge&logo=express&logoColor=black
 [express-url]: https://expressjs.com/
